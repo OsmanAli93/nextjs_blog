@@ -83,7 +83,7 @@ const Login = () => {
                 {fields.length > 0 &&
                   fields.map((field) => {
                     return field.name === "remember" ? (
-                      <div className="flex items-center">
+                      <div key={field.id} className="flex items-center">
                         <div className="flex">
                           <input
                             id={field.id.toString()}
@@ -103,12 +103,23 @@ const Login = () => {
                       </div>
                     ) : (
                       <div key={field.id}>
-                        <label
-                          htmlFor={field.id.toString()}
-                          className="block text-sm mb-2 dark:text-white"
-                        >
-                          {field.label}
-                        </label>
+                        <div className="flex justify-between items-center">
+                          <label
+                            htmlFor={field.id.toString()}
+                            className="block text-sm mb-2 dark:text-white"
+                          >
+                            {field.label}
+                          </label>
+                          {field.name === "password" && (
+                            <Link
+                              className="text-sm text-blue-600 decoration-2 mb-2 hover:underline font-medium"
+                              href="/auth/forgot-password"
+                            >
+                              Forgot password?
+                            </Link>
+                          )}
+                        </div>
+
                         <div className="relative">
                           <input
                             type={field.type}
