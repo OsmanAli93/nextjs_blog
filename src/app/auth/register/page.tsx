@@ -119,7 +119,7 @@ const Register: React.FC = () => {
                           type={field.type}
                           id={field.name}
                           {...register(field.name as keyof FormValues)}
-                          className="shrink-0 mt-0.5 border-gray-200 rounded text-blue-600 focus:ring-blue-500 dark:bg-neutral-800 dark:border-neutral-700 dark:checked:bg-blue-500 dark:checked:border-blue-500 dark:focus:ring-offset-gray-800"
+                          className="shrink-0 mt-0.5 border-gray-200 rounded text-blue-600  dark:bg-neutral-800 dark:border-neutral-700 dark:checked:bg-blue-500 dark:checked:border-blue-500 dark:focus:ring-offset-gray-800"
                         />
                       </div>
                       <div className="ms-3">
@@ -179,8 +179,8 @@ const Register: React.FC = () => {
                           })}
                           className={`py-3 px-4 block w-full rounded-lg text-sm border ${
                             errors[field.name as keyof FormValues]
-                              ? "border-red-500 focus:border-red-500 focus:ring-red-500"
-                              : "border-gray-200 focus:border-blue-500 focus:ring-blue-500"
+                              ? "border-red-500 focus:outline-none focus:border-red-500 focus:ring-red-500"
+                              : "border-gray-200 focus:outline-none focus:border-blue-500 focus:ring-blue-500"
                           } dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-400`}
                         />
                         {errors[field.name as keyof FormValues] && (
