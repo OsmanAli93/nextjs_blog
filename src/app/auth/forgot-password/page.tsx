@@ -1,7 +1,34 @@
+"use client";
 import Link from "next/link";
 import React from "react";
+import { useForm, SubmitHandler } from "react-hook-form";
+
+type FormValues = {
+  email: string;
+};
+
+type EmailValidationRule = {
+  value: RegExp;
+  message: string;
+};
 
 const ForgotPassword = () => {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isDirty, isValid },
+  } = useForm<FormValues>({ mode: "onChange" });
+
+  const emailValidationRule: EmailValidationRule = {
+    value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+    message: "Please enter a valid email address",
+  };
+
+  const onSubmit: SubmitHandler<FormValues> = (data) => {
+    console.log(data);
+    // Add your form submission logic here
+  };
+
   return (
     <div className="w-full max-w-lg mx-auto p-6">
       <div className="mt-7 bg-white border border-gray-200 rounded-xl shadow-sm dark:bg-neutral-900 dark:border-neutral-700">
@@ -22,7 +49,7 @@ const ForgotPassword = () => {
           </div>
 
           <div className="mt-5">
-            <form>
+            <form onSubmit={handleSubmit(onSubmit)}>
               <div className="grid gap-y-4">
                 <div>
                   <label
@@ -35,8 +62,15 @@ const ForgotPassword = () => {
                     <input
                       type="email"
                       id="email"
-                      name="email"
-                      className="w-full py-3 px-4 inline-flex justify-center items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-white dark:hover:bg-neutral-800"
+                      {...register("email", {
+                        required: "Email address is required!",
+                        pattern: emailValidationRule,
+                      })}
+                      className={`py-3 px-4 block w-full rounded-lg text-sm border ${
+                        errors.email
+                          ? "border-red-500 focus:outline-none focus:border-red-500 focus:ring-red-500"
+                          : "border-gray-200 focus:outline-none focus:border-blue-500 focus:ring-blue-500"
+                      } dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-400`}
                       required
                       aria-describedby="email-error"
                     />
@@ -53,17 +87,16 @@ const ForgotPassword = () => {
                       </svg>
                     </div>
                   </div>
-                  <p
-                    className="hidden text-xs text-red-600 mt-2"
-                    id="email-error"
-                  >
-                    Please include a valid email address so we can get back to
-                    you
-                  </p>
+                  {errors.email && (
+                    <p className="text-sm text-red-600 mt-2">
+                      {errors.email.message}
+                    </p>
+                  )}
                 </div>
 
                 <button
                   type="submit"
+                  disabled={!isDirty || !isValid}
                   className="w-full py-3 px-4 inline-flex justify-center items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none"
                 >
                   Reset password
