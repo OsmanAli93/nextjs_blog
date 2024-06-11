@@ -1,5 +1,15 @@
+"use client";
 import Link from "next/link";
 import React from "react";
+import { useForm, SubmitHandler } from "react-hook-form";
+
+type FormValues = {
+  name: string;
+  email: string;
+  password: string;
+  password_confirmation: string;
+  terms?: boolean;
+};
 
 const fields = [
   {
@@ -30,11 +40,20 @@ const fields = [
     id: 5,
     type: "checkbox",
     name: "terms",
-    label: "",
+    label: "I accept the Terms and Conditions",
   },
 ];
 
-const Register = () => {
+const Register: React.FC = () => {
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors, isDirty, isValid },
+  } = useForm<FormValues>({ mode: "onChange" });
+
+  const onSubmit: SubmitHandler<FormValues> = (data) => console.log(data);
+
   return (
     <div className="w-full max-w-lg mx-auto p-6">
       <div className="mt-7 bg-white border border-gray-200 rounded-xl shadow-sm dark:bg-neutral-900 dark:border-neutral-700">
@@ -90,58 +109,94 @@ const Register = () => {
               Or
             </div>
 
-            <form>
+            <form onSubmit={handleSubmit(onSubmit)}>
               <div className="grid gap-y-4">
-                {fields.length > 0 &&
-                  fields.map((field) => {
-                    return field.name === "terms" ? (
-                      <div className="flex items-center">
-                        <div className="flex">
-                          <input
-                            id={field.id.toString()}
-                            name={field.name}
-                            type={field.type}
-                            className="shrink-0 mt-0.5 border-gray-200 rounded text-blue-600 focus:ring-blue-500 dark:bg-neutral-800 dark:border-neutral-700 dark:checked:bg-blue-500 dark:checked:border-blue-500 dark:focus:ring-offset-gray-800"
-                          />
-                        </div>
-                        <div className="ms-3">
-                          <label
-                            htmlFor={field.id.toString()}
-                            className="text-sm dark:text-white"
-                          >
-                            I accept the{" "}
-                            <Link
-                              className="text-blue-600 decoration-2 hover:underline font-medium dark:text-blue-500"
-                              href="#"
-                            >
-                              Terms and Conditions
-                            </Link>
-                          </label>
-                        </div>
+                {fields.map((field) => {
+                  return field.name === "terms" ? (
+                    <div key={field.id} className="flex items-center">
+                      <div className="flex">
+                        <input
+                          type={field.type}
+                          id={field.name}
+                          {...register(field.name as keyof FormValues)}
+                          className="shrink-0 mt-0.5 border-gray-200 rounded text-blue-600 focus:ring-blue-500 dark:bg-neutral-800 dark:border-neutral-700 dark:checked:bg-blue-500 dark:checked:border-blue-500 dark:focus:ring-offset-gray-800"
+                        />
                       </div>
-                    ) : (
-                      <div key={field.id}>
+                      <div className="ms-3">
                         <label
-                          htmlFor={field.id.toString()}
-                          className="block text-sm mb-2 dark:text-white"
+                          htmlFor="remember-me"
+                          className="text-sm dark:text-white"
                         >
-                          {field.label}
+                          I accept the{" "}
+                          <a
+                            className="text-blue-600 decoration-2 hover:underline font-medium dark:text-blue-500"
+                            href="#"
+                          >
+                            Terms and Conditions
+                          </a>
                         </label>
-                        <div className="relative">
-                          <input
-                            type={field.type}
-                            id={field.id.toString()}
-                            name={field.name}
-                            className="w-full py-3 px-4 inline-flex justify-center items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-white dark:hover:bg-neutral-800"
-                          />
-                        </div>
                       </div>
-                    );
-                  })}
+                    </div>
+                  ) : (
+                    <div key={field.id} className="">
+                      <label
+                        htmlFor={field.name}
+                        className="block text-sm font-medium mb-2 dark:text-white"
+                      >
+                        {field.label}
+                      </label>
+                      <div className="relative">
+                        <input
+                          type={field.type}
+                          id={field.name}
+                          {...register(field.name as keyof FormValues, {
+                            required:
+                              field.type !== "checkbox" &&
+                              `${field.label} is required`,
+                            minLength:
+                              field.type === "password" &&
+                              field.name === "password"
+                                ? {
+                                    value: 8,
+                                    message:
+                                      "Password must be at least 8 characters",
+                                  }
+                                : undefined,
+                            validate:
+                              field.name === "password_confirmation"
+                                ? (value) =>
+                                    value === watch("password") ||
+                                    "Passwords do not match"
+                                : undefined,
+                            pattern:
+                              field.type === "email"
+                                ? {
+                                    value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                                    message:
+                                      "Please enter a valid email address",
+                                  }
+                                : undefined,
+                          })}
+                          className={`py-3 px-4 block w-full rounded-lg text-sm border ${
+                            errors[field.name as keyof FormValues]
+                              ? "border-red-500 focus:border-red-500 focus:ring-red-500"
+                              : "border-gray-200 focus:border-blue-500 focus:ring-blue-500"
+                          } dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-400`}
+                        />
+                        {errors[field.name as keyof FormValues] && (
+                          <p className="text-sm text-red-600 mt-2">
+                            {errors[field.name as keyof FormValues]?.message}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
 
                 <button
                   type="submit"
                   className="w-full py-3 px-4 inline-flex justify-center items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none"
+                  disabled={!isDirty || !isValid}
                 >
                   Sign up
                 </button>
