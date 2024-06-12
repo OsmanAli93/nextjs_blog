@@ -65,7 +65,7 @@ const Register: React.FC = () => {
             <p className="mt-2 text-sm text-gray-600 dark:text-neutral-400">
               Already have an account?
               <Link
-                className="text-blue-600 decoration-2 hover:underline font-medium dark:text-blue-500"
+                className="text-blue-600 decoration-2 ps-1 hover:underline font-medium dark:text-blue-500"
                 href="/auth/login"
               >
                 Sign in here

@@ -30,7 +30,7 @@ const fields = [
   },
 ];
 
-const Login = () => {
+const Login: React.FC = () => {
   const {
     register,
     handleSubmit,
@@ -50,7 +50,7 @@ const Login = () => {
             <p className="mt-2 text-sm text-gray-600 dark:text-neutral-400">
               Don't have an account yet?
               <Link
-                className="text-blue-600 decoration-2 hover:underline font-medium dark:text-blue-500"
+                className="text-blue-600 decoration-2 ps-1 hover:underline font-medium dark:text-blue-500"
                 href="/auth/register"
               >
                 Sign up here

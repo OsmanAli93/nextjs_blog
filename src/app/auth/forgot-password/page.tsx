@@ -12,7 +12,7 @@ type EmailValidationRule = {
   message: string;
 };
 
-const ForgotPassword = () => {
+const ForgotPassword: React.FC = () => {
   const {
     register,
     handleSubmit,
@@ -40,7 +40,7 @@ const ForgotPassword = () => {
             <p className="mt-2 text-sm text-gray-600 dark:text-neutral-400">
               Remember your password?
               <Link
-                className="text-blue-600 decoration-2 hover:underline font-medium dark:text-blue-500"
+                className="text-blue-600 decoration-2 hover:underline font-medium dark:text-blue-500 ps-1"
                 href="/auth/login"
               >
                 Sign in here
