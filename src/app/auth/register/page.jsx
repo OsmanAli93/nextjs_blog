@@ -1,15 +1,11 @@
 "use client";
 import Link from "next/link";
 import React from "react";
-import { useForm, SubmitHandler } from "react-hook-form";
-
-type FormValues = {
-  name: string;
-  email: string;
-  password: string;
-  password_confirmation: string;
-  terms?: boolean;
-};
+import { useForm } from "react-hook-form";
+import { connect, useDispatch } from "react-redux";
+import { LOADING, REGISTER_USER } from "../../../constants/index";
+import Alert from "../../../components/Alert/Alert";
+import Spinner from "../../../components/Spinner/Spinner";
 
 const fields = [
   {
@@ -44,15 +40,22 @@ const fields = [
   },
 ];
 
-const Register: React.FC = () => {
+const Register = ({ loading, pending, error, addUser }) => {
   const {
     register,
     handleSubmit,
     watch,
     formState: { errors, isDirty, isValid },
-  } = useForm<FormValues>({ mode: "onChange" });
+  } = useForm({ mode: "onChange" });
 
-  const onSubmit: SubmitHandler<FormValues> = (data) => console.log(data);
+  const dispatch = useDispatch();
+
+  const onSubmit = async (data) => {
+    pending(true);
+    addUser(data);
+  };
+
+  console.log(loading);
 
   return (
     <div className="w-full max-w-lg mx-auto p-6">
@@ -109,6 +112,8 @@ const Register: React.FC = () => {
               Or
             </div>
 
+            {error && <Alert color="danger" text={error} />}
+
             <form onSubmit={handleSubmit(onSubmit)}>
               <div className="grid gap-y-4">
                 {fields.map((field) => {
@@ -118,7 +123,10 @@ const Register: React.FC = () => {
                         <input
                           type={field.type}
                           id={field.name}
-                          {...register(field.name as keyof FormValues)}
+                          {...register(field.name, {
+                            required:
+                              "Please agree with the terms and conditions",
+                          })}
                           className="shrink-0 mt-0.5 border-gray-200 rounded text-blue-600  dark:bg-neutral-800 dark:border-neutral-700 dark:checked:bg-blue-500 dark:checked:border-blue-500 dark:focus:ring-offset-gray-800"
                         />
                       </div>
@@ -149,7 +157,7 @@ const Register: React.FC = () => {
                         <input
                           type={field.type}
                           id={field.name}
-                          {...register(field.name as keyof FormValues, {
+                          {...register(field.name, {
                             required:
                               field.type !== "checkbox" &&
                               `${field.label} is required`,
@@ -178,14 +186,14 @@ const Register: React.FC = () => {
                                 : undefined,
                           })}
                           className={`py-3 px-4 block w-full rounded-lg text-sm border ${
-                            errors[field.name as keyof FormValues]
+                            errors[field.name]
                               ? "border-red-500 focus:outline-none focus:border-red-500 focus:ring-red-500"
                               : "border-gray-200 focus:outline-none focus:border-blue-500 focus:ring-blue-500"
                           } dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-400`}
                         />
-                        {errors[field.name as keyof FormValues] && (
+                        {errors[field.name] && (
                           <p className="text-sm text-red-600 mt-2">
-                            {errors[field.name as keyof FormValues]?.message}
+                            {errors[field.name]?.message}
                           </p>
                         )}
                       </div>
@@ -196,9 +204,9 @@ const Register: React.FC = () => {
                 <button
                   type="submit"
                   className="w-full py-3 px-4 inline-flex justify-center items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none"
-                  disabled={!isDirty || !isValid}
+                  disabled={!isDirty || !isValid || loading}
                 >
-                  Sign up
+                  {loading ? <Spinner color="blue" /> : <span>Sign up</span>}
                 </button>
               </div>
             </form>
@@ -209,4 +217,18 @@ const Register: React.FC = () => {
   );
 };
 
-export default Register;
+const mapStateToProps = (state) => {
+  return {
+    loading: state.auth.loading,
+    error: state.auth.errorMessage,
+  };
+};
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    addUser: (data) => dispatch({ type: REGISTER_USER, data }),
+    pending: (payload) => dispatch({ type: LOADING, payload }),
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Register);

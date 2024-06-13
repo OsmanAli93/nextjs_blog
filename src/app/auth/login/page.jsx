@@ -1,13 +1,7 @@
 "use client";
 import Link from "next/link";
 import React from "react";
-import { useForm, SubmitHandler } from "react-hook-form";
-
-type FormValues = {
-  email: string;
-  password: string;
-  remember?: boolean;
-};
+import { useForm } from "react-hook-form";
 
 const fields = [
   {
@@ -30,14 +24,14 @@ const fields = [
   },
 ];
 
-const Login: React.FC = () => {
+const Login = () => {
   const {
     register,
     handleSubmit,
     formState: { errors, isDirty, isValid },
-  } = useForm<FormValues>({ mode: "onChange" });
+  } = useForm({ mode: "onChange" });
 
-  const onSubmit: SubmitHandler<FormValues> = (data) => console.log(data);
+  const onSubmit = (data) => console.log(data);
 
   return (
     <div className="w-full max-w-lg mx-auto p-6">
@@ -103,7 +97,7 @@ const Login: React.FC = () => {
                         <div className="flex">
                           <input
                             id={field.name}
-                            {...register(field.name as keyof FormValues)}
+                            {...register(field.name)}
                             type={field.type}
                             className="shrink-0 mt-0.5 border-gray-200 rounded text-blue-600 focus:ring-blue-500 dark:bg-neutral-800 dark:border-neutral-700 dark:checked:bg-blue-500 dark:checked:border-blue-500 dark:focus:ring-offset-gray-800"
                           />
@@ -140,7 +134,7 @@ const Login: React.FC = () => {
                           <input
                             type={field.type}
                             id={field.name}
-                            {...register(field.name as keyof FormValues, {
+                            {...register(field.name, {
                               required: `${field.name} is required!`,
                               minLength:
                                 field.type === "password" &&
@@ -161,14 +155,14 @@ const Login: React.FC = () => {
                                   : undefined,
                             })}
                             className={`py-3 px-4 block w-full rounded-lg text-sm border ${
-                              errors[field.name as keyof FormValues]
+                              errors[field.name]
                                 ? "border-red-500 focus:outline-none focus:border-red-500 focus:ring-red-500"
                                 : "border-gray-200 focus:outline-none focus:border-blue-500 focus:ring-blue-500"
                             } dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-400`}
                           />
-                          {errors[field.name as keyof FormValues] && (
+                          {errors[field.name] && (
                             <p className="text-sm text-red-600 mt-2">
-                              {errors[field.name as keyof FormValues]?.message}
+                              {errors[field.name]?.message}
                             </p>
                           )}
                         </div>

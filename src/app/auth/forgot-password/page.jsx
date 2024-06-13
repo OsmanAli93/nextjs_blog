@@ -1,30 +1,21 @@
 "use client";
 import Link from "next/link";
 import React from "react";
-import { useForm, SubmitHandler } from "react-hook-form";
+import { useForm } from "react-hook-form";
 
-type FormValues = {
-  email: string;
-};
-
-type EmailValidationRule = {
-  value: RegExp;
-  message: string;
-};
-
-const ForgotPassword: React.FC = () => {
+const ForgotPassword = () => {
   const {
     register,
     handleSubmit,
     formState: { errors, isDirty, isValid },
-  } = useForm<FormValues>({ mode: "onChange" });
+  } = useForm({ mode: "onChange" });
 
-  const emailValidationRule: EmailValidationRule = {
+  const emailValidationRule = {
     value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
     message: "Please enter a valid email address",
   };
 
-  const onSubmit: SubmitHandler<FormValues> = (data) => {
+  const onSubmit = (data) => {
     console.log(data);
     // Add your form submission logic here
   };
