@@ -1,7 +1,9 @@
+import { ThemeModeScript } from "flowbite-react";
 import { Inter } from "next/font/google";
 import "../styles/globals.css";
-import PrelineScript from "../components/PrelineScript";
 import { Providers } from "../store/provider";
+
+import Header from "../components/Header/Header";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -13,10 +15,15 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
+      <head>
+        <ThemeModeScript />
+      </head>
       <body className={`${inter.className} bg-gray-100`}>
-        <Providers>{children}</Providers>
+        <Providers>
+          <Header />
+          {children}
+        </Providers>
       </body>
-      <PrelineScript />
     </html>
   );
 }

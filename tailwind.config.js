@@ -1,10 +1,12 @@
+import flowbite from "flowbite-react/tailwind";
+
 const config = {
   darkMode: "class",
   content: [
     "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
-    "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
-    "./node_modules/preline/preline.js",
+    "./src/**/*.{js,ts,jsx,tsx,mdx}",
+    flowbite.content(),
   ],
   theme: {
     screens: {
@@ -21,6 +23,6 @@ const config = {
       },
     },
   },
-  plugins: [require("preline/plugin")],
+  plugins: [flowbite.plugin()],
 };
 export default config;
