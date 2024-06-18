@@ -10,7 +10,7 @@ import rootSaga from "./sagas";
 const persistConfig = getPersistConfig({
   key: "root",
   storage,
-  whitelist: ["auth.access_token"],
+  whitelist: ["auth.access_token", "auth.user"],
   timeout: 100,
   rootReducer,
 });

@@ -1,8 +1,9 @@
 "use client";
 import Link from "next/link";
-import React from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
-import { connect, useDispatch } from "react-redux";
+import { useRouter } from "next/navigation";
+import { connect } from "react-redux";
 import { LOADING, REGISTER_USER } from "../../../constants/index";
 import Alert from "../../../components/Alert/Alert";
 import Spinner from "../../../components/Spinner/Spinner";
@@ -48,11 +49,11 @@ const Register = ({ loading, pending, error, addUser }) => {
     formState: { errors, isDirty, isValid },
   } = useForm({ mode: "onChange" });
 
-  const dispatch = useDispatch();
+  const router = useRouter();
 
   const onSubmit = async (data) => {
     pending(true);
-    addUser(data);
+    addUser(data, router);
   };
 
   console.log(loading);
@@ -226,7 +227,7 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    addUser: (data) => dispatch({ type: REGISTER_USER, data }),
+    addUser: (data, router) => dispatch({ type: REGISTER_USER, data, router }),
     pending: (payload) => dispatch({ type: LOADING, payload }),
   };
 };

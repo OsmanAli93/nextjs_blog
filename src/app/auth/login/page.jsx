@@ -1,7 +1,13 @@
 "use client";
-import Link from "next/link";
 import React from "react";
+import Link from "next/link";
+import { connect } from "react-redux";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
+import { LOADING, LOGIN_USER } from "../../../constants";
+
+import Spinner from "../../../components/Spinner/Spinner";
+import Alert from "../../../components/Alert/Alert";
 
 const fields = [
   {
@@ -24,14 +30,21 @@ const fields = [
   },
 ];
 
-const Login = () => {
+const Login = ({ loading, pending, error, loginUser }) => {
   const {
     register,
     handleSubmit,
     formState: { errors, isDirty, isValid },
   } = useForm({ mode: "onChange" });
 
-  const onSubmit = (data) => console.log(data);
+  const router = useRouter();
+
+  const onSubmit = (user) => {
+    pending(true);
+    loginUser(user, router);
+  };
+
+  console.log(loading);
 
   return (
     <div className="w-full max-w-lg mx-auto p-6">
@@ -88,7 +101,9 @@ const Login = () => {
               Or
             </div>
 
-            <form>
+            {error && <Alert color="danger" text={error} />}
+
+            <form onSubmit={handleSubmit(onSubmit)}>
               <div className="grid gap-y-4">
                 {fields.length > 0 &&
                   fields.map((field) => {
@@ -172,10 +187,10 @@ const Login = () => {
 
                 <button
                   type="submit"
-                  disabled={!isDirty || !isValid}
+                  disabled={!isDirty || !isValid || loading}
                   className="w-full py-3 px-4 inline-flex justify-center items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none"
                 >
-                  Sign in
+                  {loading ? <Spinner color="blue" /> : <span>Sign in</span>}
                 </button>
               </div>
             </form>
@@ -186,4 +201,18 @@ const Login = () => {
   );
 };
 
-export default Login;
+const mapStateToProps = (state) => {
+  return {
+    loading: state.auth.loading,
+    error: state.auth.errorMessage,
+  };
+};
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    loginUser: (user, router) => dispatch({ type: LOGIN_USER, user, router }),
+    pending: (payload) => dispatch({ type: LOADING, payload }),
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Login);
