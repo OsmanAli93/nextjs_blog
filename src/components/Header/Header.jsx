@@ -4,6 +4,7 @@ import { connect } from "react-redux";
 import { Avatar, Dropdown, Navbar } from "flowbite-react";
 import { LOGOUT_USER } from "../../constants";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import axiosInstance from "../../services/axiosInstance";
 
 const Header = ({ access_token, user, logout }) => {
@@ -66,15 +67,34 @@ const Header = ({ access_token, user, logout }) => {
       )}
 
       <Navbar.Collapse>
-        <Navbar.Link href="/">Home</Navbar.Link>
-        <Navbar.Link href="#">About</Navbar.Link>
-        <Navbar.Link href="#">Services</Navbar.Link>
-        <Navbar.Link href="#">Pricing</Navbar.Link>
-        <Navbar.Link href="#">Contact</Navbar.Link>
+        <Navbar.Link as={"div"}>
+          <Link href="/">Home</Link>
+        </Navbar.Link>
+        <Navbar.Link as={"div"}>
+          <Link href="#">About</Link>
+        </Navbar.Link>
+        <Navbar.Link as={"div"}>
+          <Link href="#">Services</Link>
+        </Navbar.Link>
+        <Navbar.Link as="div">
+          <Link href="#">Pricing</Link>
+        </Navbar.Link>
+        <Navbar.Link as="div">
+          <Link href="#">Contact</Link>
+        </Navbar.Link>
         {!access_token && !user ? (
-          <Navbar.Link href="/auth/login">Login</Navbar.Link>
+          <Navbar.Link as="div">
+            <Link
+              href="/auth/login"
+              className="text-white bg-gradient-to-r from-teal-400 via-teal-500 to-teal-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-teal-300 dark:focus:ring-teal-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
+            >
+              Login
+            </Link>
+          </Navbar.Link>
         ) : (
-          <Navbar.Link href="#">Post</Navbar.Link>
+          <Navbar.Link as="div">
+            <Link href="#">Post</Link>
+          </Navbar.Link>
         )}
       </Navbar.Collapse>
     </Navbar>
