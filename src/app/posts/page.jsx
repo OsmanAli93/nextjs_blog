@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useLayoutEffect } from "react";
+import React, { useState, useLayoutEffect, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { connect } from "react-redux";
 import { useRouter } from "next/navigation";
@@ -10,10 +10,12 @@ const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
 import "react-quill/dist/quill.snow.css";
 
 const Post = ({ access_token, user }) => {
-  const [value, setValue] = useState("");
   const {
     register,
     handleSubmit,
+    setValue,
+    reset,
+    watch,
     formState: { errors, isDirty, isValid },
   } = useForm();
 
@@ -39,11 +41,14 @@ const Post = ({ access_token, user }) => {
     }
   }, [user]);
 
+  useEffect(() => {
+    register("message", { required: "Message is required!" });
+  }, [register]);
+
+  const editorContent = watch("message");
+
   const onSubmit = (data) => {
-    console.log({
-      ...data,
-      value,
-    });
+    console.log(data);
   };
 
   return (
@@ -59,7 +64,18 @@ const Post = ({ access_token, user }) => {
               <div className="mb-2 block">
                 <Label htmlFor="thumbnail" value="Thumbnail" />
               </div>
-              <FileInput id="thumbnail" {...register("thumbnail")} />
+              <FileInput
+                id="thumbnail"
+                {...register("thumbnail", {
+                  required: "Thumbnail is required!",
+                })}
+              />
+
+              {errors.thumbnail && (
+                <p className="text-sm text-red-600 mt-2">
+                  {errors.thumbnail?.message}
+                </p>
+              )}
             </div>
 
             <div className="mb-4">
@@ -68,12 +84,19 @@ const Post = ({ access_token, user }) => {
               </div>
               <TextInput
                 id="title"
-                {...register("title")}
+                {...register("title", {
+                  required: "Title is required!",
+                })}
                 type="text"
                 placeholder="Post Title"
-                required
                 shadow
               />
+
+              {errors.title && (
+                <p className="text-sm text-red-600 mt-2">
+                  {errors.title?.message}
+                </p>
+              )}
             </div>
 
             <div className="mb-4">
@@ -82,12 +105,19 @@ const Post = ({ access_token, user }) => {
               </div>
               <TextInput
                 id="description"
-                {...register("description")}
+                {...register("description", {
+                  required: "Description is required!",
+                })}
                 type="text"
                 placeholder="A Brief Of Description About This Post"
-                required
                 shadow
               />
+
+              {errors.description && (
+                <p className="text-sm text-red-600 mt-2">
+                  {errors.description?.message}
+                </p>
+              )}
             </div>
 
             <div className="mb-4">
@@ -97,10 +127,16 @@ const Post = ({ access_token, user }) => {
               <ReactQuill
                 id="message"
                 theme="snow"
-                value={value}
+                value={editorContent}
                 modules={modules}
-                onChange={setValue}
+                onChange={(value) => setValue("message", value)}
               />
+
+              {errors.message && (
+                <p className="text-sm text-red-600 mt-2">
+                  {errors.message?.message}
+                </p>
+              )}
             </div>
 
             <div className="mb-4 flex items-center justify-end gap-x-6">
