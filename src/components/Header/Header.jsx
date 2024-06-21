@@ -48,7 +48,9 @@ const Header = ({ access_token, user, logout }) => {
                 {user?.email}
               </span>
             </Dropdown.Header>
-            <Dropdown.Item>Dashboard</Dropdown.Item>
+            <Dropdown.Item>
+              <Link href="/profile">Profile</Link>
+            </Dropdown.Item>
             <Dropdown.Item>Settings</Dropdown.Item>
             <Dropdown.Item>Earnings</Dropdown.Item>
             <Dropdown.Divider />
