@@ -15,6 +15,10 @@ const config = {
       lg: "976px",
       xl: "1440px",
     },
+    container: {
+      center: true,
+      padding: "1rem",
+    },
     extend: {
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",

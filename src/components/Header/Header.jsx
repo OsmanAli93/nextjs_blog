@@ -93,7 +93,7 @@ const Header = ({ access_token, user, logout }) => {
           </Navbar.Link>
         ) : (
           <Navbar.Link as="div">
-            <Link href="#">Post</Link>
+            <Link href="/posts">Write</Link>
           </Navbar.Link>
         )}
       </Navbar.Collapse>
