@@ -8,22 +8,26 @@ import {
   LOGOUT_USER,
   LOGOUT_SUCCESS,
   LOGOUT_FAILED,
+  UPDATE_PROFILE,
+  UPDATE_PROFILE_SUCCESS,
+  UPDATE_PROFILE_FAILED,
 } from "../constants";
 
 import { takeLatest, takeEvery, put, call } from "redux-saga/effects";
 import authService from "../services/authService/authService";
+import profileService from "../services/profileService/profileService";
 
 function* registerUser(action) {
   const results = yield call(authService.register, action.data);
 
-  if (results.code === "ERR_NETWORK") {
+  if (results?.code === "ERR_NETWORK") {
     yield put({
       type: REGISTER_FAILED,
       error: results.message,
     });
   }
 
-  if (results.status >= 200 && results.status < 400) {
+  if (results?.status >= 200 && results.status < 400) {
     yield put({
       type: REGISTER_SUCCESS,
       payload: results.data.token,
@@ -33,7 +37,7 @@ function* registerUser(action) {
     return action.router.push("/");
   }
 
-  if (results.response.status >= 400 && results.response.status < 600) {
+  if (results?.response.status >= 400 && results.response.status < 600) {
     console.log(results);
     yield put({
       type: REGISTER_FAILED,
@@ -44,17 +48,15 @@ function* registerUser(action) {
 
 function* loginUser(action) {
   const results = yield call(authService.login, action.user);
-  console.log("saga", results);
 
-  if (results.code === "ERR_NETWORK") {
+  if (results?.code === "ERR_NETWORK") {
     yield put({
       type: LOGIN_FAILED,
       error: results.message,
     });
   }
 
-  if (results.status >= 200 && results.status < 400) {
-    console.log(results);
+  if (results?.status >= 200 && results.status < 400) {
     yield put({
       type: LOGIN_SUCCESS,
       payload: results.data.access_token,
@@ -65,8 +67,7 @@ function* loginUser(action) {
     return action.router.push("/");
   }
 
-  if (results.response.status >= 400 && results.response.status < 600) {
-    console.log(results);
+  if (results?.response.status >= 400 && results.response.status < 600) {
     yield put({
       type: LOGIN_FAILED,
       error: results.response.data.message,
@@ -76,16 +77,15 @@ function* loginUser(action) {
 
 function* logoutUser(action) {
   const results = yield call(authService.logout);
-  console.log("saga", results);
 
-  if (results.code === "ERR_NETWORK") {
+  if (results?.code === "ERR_NETWORK") {
     yield put({
       type: LOGOUT_FAILED,
       error: results.message,
     });
   }
 
-  if (results.status >= 200 && results.status < 400) {
+  if (results?.status >= 200 && results.status < 400) {
     console.log(results);
     yield put({
       type: LOGOUT_SUCCESS,
@@ -95,10 +95,39 @@ function* logoutUser(action) {
     return action.router.push("/");
   }
 
-  if (results.response.status >= 400 && results.response.status < 600) {
+  if (results?.response.status >= 400 && results.response.status < 600) {
     console.log(results);
     yield put({
       type: LOGOUT_FAILED,
+      error: results.response.data.message,
+    });
+  }
+}
+
+function* updateProfile(action) {
+  const results = yield call(profileService.update, action.id, action.data);
+
+  console.log("saga", action.data);
+
+  if (results?.code === "ERR_NETWORK") {
+    yield put({
+      type: UPDATE_PROFILE_FAILED,
+      error: results.message,
+    });
+  }
+
+  if (results.status >= 200 && results.status < 400) {
+    console.log("profile", results);
+    yield put({
+      type: UPDATE_PROFILE_SUCCESS,
+      payload: results.data.user,
+      success: results.data.message,
+    });
+  }
+
+  if (results?.response?.status >= 400 && results.response?.status < 600) {
+    yield put({
+      type: UPDATE_PROFILE_FAILED,
       error: results.response.data.message,
     });
   }
@@ -108,6 +137,7 @@ function* sagaWatcher() {
   yield takeLatest(REGISTER_USER, registerUser);
   yield takeLatest(LOGIN_USER, loginUser);
   yield takeLatest(LOGOUT_USER, logoutUser);
+  yield takeLatest(UPDATE_PROFILE, updateProfile);
 }
 
 export default sagaWatcher;

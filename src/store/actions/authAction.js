@@ -1,4 +1,10 @@
-import { REGISTER_USER, LOGIN_USER, LOGOUT_USER, LOADING } from "@/constants";
+import {
+  REGISTER_USER,
+  LOGIN_USER,
+  LOGOUT_USER,
+  UPDATE_PROFILE,
+  LOADING,
+} from "@/constants";
 
 export const registerUserAction = (data, navigate) => {
   return {
@@ -20,6 +26,14 @@ export const logoutUserAction = (navigate) => {
   return {
     type: LOGOUT_USER,
     navigate,
+  };
+};
+
+export const updateProfileAction = (id, data) => {
+  return {
+    type: UPDATE_PROFILE,
+    id,
+    data,
   };
 };
 
