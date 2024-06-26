@@ -25,7 +25,7 @@ export const authReducer = (state = initialState, action) => {
         ...state,
         access_token: action.payload,
         user: action.user,
-        successMessage: action.message,
+        successMessage: action.success,
         loading: false,
       };
     case REGISTER_FAILED:
@@ -40,7 +40,7 @@ export const authReducer = (state = initialState, action) => {
         ...state,
         access_token: action.payload,
         user: action.user,
-        successMessage: action.message,
+        successMessage: action.success,
         errorMessage: "",
         loading: false,
       };
@@ -54,7 +54,7 @@ export const authReducer = (state = initialState, action) => {
     case LOGOUT_SUCCESS:
       return {
         ...state,
-        successMessage: action.message,
+        successMessage: action.success,
         errorMessage: "",
         loading: false,
       };
@@ -69,7 +69,7 @@ export const authReducer = (state = initialState, action) => {
       return {
         ...state,
         user: action.payload,
-        successMessage: action.message,
+        successMessage: action.success,
         loading: false,
       };
     case UPDATE_PROFILE_FAILED:

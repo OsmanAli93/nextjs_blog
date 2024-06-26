@@ -107,8 +107,6 @@ function* logoutUser(action) {
 function* updateProfile(action) {
   const results = yield call(profileService.update, action.id, action.data);
 
-  console.log("saga", action.data);
-
   if (results?.code === "ERR_NETWORK") {
     yield put({
       type: UPDATE_PROFILE_FAILED,
@@ -117,7 +115,6 @@ function* updateProfile(action) {
   }
 
   if (results.status >= 200 && results.status < 400) {
-    console.log("profile", results);
     yield put({
       type: UPDATE_PROFILE_SUCCESS,
       payload: results.data.user,

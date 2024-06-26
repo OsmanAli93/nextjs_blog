@@ -5,9 +5,11 @@ import { connect } from "react-redux";
 import { useForm } from "react-hook-form";
 import { PhotoIcon, UserCircleIcon } from "@heroicons/react/24/solid";
 import { LOADING, UPDATE_PROFILE } from "../../constants";
+import Spinner from "../../components/Spinner/Spinner";
 import axiosInstance from "../../services/axiosInstance";
+import Toast from "../../components/Toast/Toast";
 
-const Profile = ({ access_token, user, pending, update }) => {
+const Profile = ({ access_token, user, loading, pending, update, success }) => {
   const {
     register,
     setValue,
@@ -66,7 +68,7 @@ const Profile = ({ access_token, user, pending, update }) => {
     console.log(file);
   };
 
-  console.log(access_token);
+  console.log(success);
 
   return (
     <section className="py-[90px]">
@@ -101,6 +103,7 @@ const Profile = ({ access_token, user, pending, update }) => {
                           {...register("username")}
                           id="username"
                           autoComplete="username"
+                          defaultValue={user?.profile.username}
                           className="block flex-1 border-0 bg-transparent py-1.5 pl-1 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
                           placeholder="janesmith"
                         />
@@ -121,7 +124,7 @@ const Profile = ({ access_token, user, pending, update }) => {
                         {...register("about")}
                         rows={3}
                         className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-teal-600 sm:text-sm sm:leading-6"
-                        defaultValue={""}
+                        defaultValue={user?.profile.about}
                       />
                     </div>
                     <p className="mt-3 text-sm leading-6 text-gray-600">
@@ -209,6 +212,7 @@ const Profile = ({ access_token, user, pending, update }) => {
                                     setBackgroundPreview(
                                       URL.createObjectURL(file)
                                     );
+                                    setValue("background_image", file);
                                   }
                                 }}
                                 className="sr-only"
@@ -288,6 +292,7 @@ const Profile = ({ access_token, user, pending, update }) => {
                         {...register("country")}
                         autoComplete="country-name"
                         className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-teal-600 sm:text-sm sm:leading-6"
+                        defaultValue={user?.profile.country}
                       >
                         <option>United States</option>
                         <option>Canada</option>
@@ -310,6 +315,7 @@ const Profile = ({ access_token, user, pending, update }) => {
                         id="street-address"
                         autoComplete="street-address"
                         className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-teal-600 sm:text-sm sm:leading-6"
+                        defaultValue={user?.profile.address}
                       />
                     </div>
                   </div>
@@ -328,6 +334,7 @@ const Profile = ({ access_token, user, pending, update }) => {
                         id="city"
                         autoComplete="address-level2"
                         className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-teal-600 sm:text-sm sm:leading-6"
+                        defaultValue={user?.profile.city}
                       />
                     </div>
                   </div>
@@ -346,6 +353,7 @@ const Profile = ({ access_token, user, pending, update }) => {
                         id="region"
                         autoComplete="address-level1"
                         className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-teal-600 sm:text-sm sm:leading-6"
+                        defaultValue={user?.profile.state}
                       />
                     </div>
                   </div>
@@ -364,6 +372,7 @@ const Profile = ({ access_token, user, pending, update }) => {
                         id="postal-code"
                         autoComplete="postal-code"
                         className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-teal-600 sm:text-sm sm:leading-6"
+                        defaultValue={user?.profile.postal_code}
                       />
                     </div>
                   </div>
@@ -382,12 +391,14 @@ const Profile = ({ access_token, user, pending, update }) => {
                 type="submit"
                 className="rounded-md bg-teal-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-teal-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-600"
               >
-                Save
+                {loading ? <Spinner color="teal" /> : <span>Save</span>}
               </button>
             </div>
           </form>
         </div>
       </div>
+
+      {success !== "" && <Toast success={true} message={success} />}
     </section>
   );
 };
@@ -396,6 +407,8 @@ const mapStateToProps = (state) => {
   return {
     access_token: state.auth.access_token,
     user: state.auth.user,
+    loading: state.auth.loading,
+    success: state.auth.successMessage,
   };
 };
 
