@@ -57,6 +57,7 @@ function* loginUser(action) {
   }
 
   if (results?.status >= 200 && results.status < 400) {
+    console.log(results);
     yield put({
       type: LOGIN_SUCCESS,
       payload: results.data.access_token,

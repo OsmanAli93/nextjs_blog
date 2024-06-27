@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useLayoutEffect } from "react";
+import React, { useState, useLayoutEffect, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { connect } from "react-redux";
 import { useForm } from "react-hook-form";
@@ -21,6 +21,7 @@ const Profile = ({
   const {
     register,
     setValue,
+    reset,
     handleSubmit,
     formState: { errors, isDirty, isValid },
   } = useForm();
@@ -35,6 +36,10 @@ const Profile = ({
       redirect.push("/auth/login");
     }
   }, []);
+
+  useEffect(() => {
+    reset(user);
+  }, [reset]);
 
   const setDefaultHeaders = (access_token) => {
     axiosInstance.defaults.headers.common.Authorization = `Bearer ${access_token}`;
@@ -187,52 +192,53 @@ const Profile = ({
                       Cover photo
                     </label>
                     <div
+                      style={
+                        backgroundPreview && {
+                          backgroundImage: `url(${backgroundPreview})`,
+                          backgroundRepeat: "no-repeat",
+                          backgroundSize: "cover",
+                          backgroundPosition: "center center",
+                        }
+                      }
                       className="mt-2 flex justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-10"
                       onDragEnter={onDragEnter}
                       onDragOver={onDragOver}
                       onDragLeave={onDragLeave}
                       onDrop={onDrop}
                     >
-                      {backgroundPreview ? (
-                        <img
-                          src={backgroundPreview}
-                          className="block w-full h-[190px]"
+                      <div className="text-center">
+                        <PhotoIcon
+                          className="mx-auto h-12 w-12 text-gray-300"
+                          aria-hidden="true"
                         />
-                      ) : (
-                        <div className="text-center">
-                          <PhotoIcon
-                            className="mx-auto h-12 w-12 text-gray-300"
-                            aria-hidden="true"
-                          />
-                          <div className="mt-4 flex text-sm leading-6 text-gray-600">
-                            <label
-                              htmlFor="background_image"
-                              className="relative cursor-pointer rounded-md bg-white font-semibold text-teal-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-teal-600 focus-within:ring-offset-2 hover:text-teal-500"
-                            >
-                              <span>Upload a file</span>
-                              <input
-                                id="background_image"
-                                {...register("background_image")}
-                                type="file"
-                                onChange={(e) => {
-                                  if (e.target.files && e.target.files[0]) {
-                                    const [file] = e.target.files;
-                                    setBackgroundPreview(
-                                      URL.createObjectURL(file)
-                                    );
-                                    setValue("background_image", file);
-                                  }
-                                }}
-                                className="sr-only"
-                              />
-                            </label>
-                            <p className="pl-1">or drag and drop</p>
-                          </div>
-                          <p className="text-xs leading-5 text-gray-600">
-                            PNG, JPG, GIF up to 10MB
-                          </p>
+                        <div className="mt-4 flex text-sm leading-6 text-gray-600">
+                          <label
+                            htmlFor="background_image"
+                            className="relative cursor-pointer rounded-md bg-white font-semibold text-teal-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-teal-600 focus-within:ring-offset-2 hover:text-teal-500"
+                          >
+                            <span>Upload a file</span>
+                            <input
+                              id="background_image"
+                              {...register("background_image")}
+                              type="file"
+                              onChange={(e) => {
+                                if (e.target.files && e.target.files[0]) {
+                                  const [file] = e.target.files;
+                                  setBackgroundPreview(
+                                    URL.createObjectURL(file)
+                                  );
+                                  setValue("background_image", file);
+                                }
+                              }}
+                              className="sr-only"
+                            />
+                          </label>
+                          <p className="pl-1">or drag and drop</p>
                         </div>
-                      )}
+                        <p className="text-xs leading-5 text-gray-600">
+                          PNG, JPG, GIF up to 10MB
+                        </p>
+                      </div>
                     </div>
                   </div>
                 </div>
