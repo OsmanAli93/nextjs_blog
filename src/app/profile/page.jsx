@@ -9,7 +9,15 @@ import Spinner from "../../components/Spinner/Spinner";
 import axiosInstance from "../../services/axiosInstance";
 import Toast from "../../components/Toast/Toast";
 
-const Profile = ({ access_token, user, loading, pending, update, success }) => {
+const Profile = ({
+  access_token,
+  user,
+  loading,
+  pending,
+  update,
+  success,
+  error,
+}) => {
   const {
     register,
     setValue,
@@ -399,6 +407,7 @@ const Profile = ({ access_token, user, loading, pending, update, success }) => {
       </div>
 
       {success !== "" && <Toast success={true} message={success} />}
+      {error !== "" && <Toast error={true} message={error} />}
     </section>
   );
 };
@@ -409,6 +418,7 @@ const mapStateToProps = (state) => {
     user: state.auth.user,
     loading: state.auth.loading,
     success: state.auth.successMessage,
+    error: state.auth.errorMessage,
   };
 };
 

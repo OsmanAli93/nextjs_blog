@@ -3,6 +3,8 @@ import {
   LOGIN_USER,
   LOGOUT_USER,
   UPDATE_PROFILE,
+  RESET_SUCCESS_MESSAGE,
+  RESET_FAILED_MESSAGE,
   LOADING,
 } from "@/constants";
 
@@ -34,6 +36,18 @@ export const updateProfileAction = (id, data) => {
     type: UPDATE_PROFILE,
     id,
     data,
+  };
+};
+
+export const resetSuccessMessage = () => {
+  return {
+    type: RESET_SUCCESS_MESSAGE,
+  };
+};
+
+export const resetFailedMessage = () => {
+  return {
+    type: RESET_FAILED_MESSAGE,
   };
 };
 

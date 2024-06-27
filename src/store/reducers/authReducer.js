@@ -7,6 +7,8 @@ import {
   LOGOUT_FAILED,
   UPDATE_PROFILE_SUCCESS,
   UPDATE_PROFILE_FAILED,
+  RESET_SUCCESS_MESSAGE,
+  RESET_FAILED_MESSAGE,
   LOADING,
 } from "../../constants/index";
 
@@ -78,6 +80,16 @@ export const authReducer = (state = initialState, action) => {
         successMessage: "",
         errorMessage: action.error,
         loading: false,
+      };
+    case RESET_SUCCESS_MESSAGE:
+      return {
+        ...state,
+        successMessage: "",
+      };
+    case RESET_FAILED_MESSAGE:
+      return {
+        ...state,
+        errorMessage: "",
       };
     case LOADING:
       return {

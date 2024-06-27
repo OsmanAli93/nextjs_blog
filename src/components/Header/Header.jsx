@@ -8,7 +8,7 @@ import Link from "next/link";
 import axiosInstance from "../../services/axiosInstance";
 
 const Header = ({ access_token, user, logout }) => {
-  const navigate = useRouter();
+  const router = useRouter();
   console.log(user);
 
   const setDefaultHeaders = (access_token) => {
@@ -57,7 +57,7 @@ const Header = ({ access_token, user, logout }) => {
             <Dropdown.Item
               onClick={() => {
                 setDefaultHeaders(access_token);
-                logout(navigate);
+                logout(router);
               }}
             >
               Sign out
@@ -112,7 +112,7 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    logout: (navigate) => dispatch({ type: LOGOUT_USER, navigate }),
+    logout: (router) => dispatch({ type: LOGOUT_USER, router }),
   };
 };
 
