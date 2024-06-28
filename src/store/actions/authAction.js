@@ -3,6 +3,7 @@ import {
   LOGIN_USER,
   LOGOUT_USER,
   UPDATE_PROFILE,
+  UPDATE_USER,
   RESET_SUCCESS_MESSAGE,
   RESET_FAILED_MESSAGE,
   LOADING,
@@ -36,6 +37,12 @@ export const updateProfileAction = (id, data) => {
     type: UPDATE_PROFILE,
     id,
     data,
+  };
+};
+
+export const updateUserAction = () => {
+  return {
+    type: UPDATE_USER,
   };
 };
 

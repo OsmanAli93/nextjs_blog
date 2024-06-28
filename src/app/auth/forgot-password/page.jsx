@@ -1,19 +1,29 @@
 "use client";
 import Link from "next/link";
-import React from "react";
+import React, { useLayoutEffect } from "react";
 import { useForm } from "react-hook-form";
+import { connect } from "react-redux";
+import { useRouter } from "next/navigation";
 
-const ForgotPassword = () => {
+const ForgotPassword = ({ access_token, user }) => {
   const {
     register,
     handleSubmit,
     formState: { errors, isDirty, isValid },
   } = useForm({ mode: "onChange" });
 
+  const router = useRouter();
+
   const emailValidationRule = {
     value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
     message: "Please enter a valid email address",
   };
+
+  useLayoutEffect(() => {
+    if (access_token && user) {
+      return router.push("/");
+    }
+  }, []);
 
   const onSubmit = (data) => {
     console.log(data);
@@ -31,7 +41,7 @@ const ForgotPassword = () => {
             <p className="mt-2 text-sm text-gray-600 dark:text-neutral-400">
               Remember your password?
               <Link
-                className="text-blue-600 decoration-2 hover:underline font-medium dark:text-blue-500 ps-1"
+                className="text-teal-600 decoration-2 hover:underline font-medium dark:text-teal-500 ps-1"
                 href="/auth/login"
               >
                 Sign in here
@@ -60,7 +70,7 @@ const ForgotPassword = () => {
                       className={`py-3 px-4 block w-full rounded-lg text-sm border ${
                         errors.email
                           ? "border-red-500 focus:outline-none focus:border-red-500 focus:ring-red-500"
-                          : "border-gray-200 focus:outline-none focus:border-blue-500 focus:ring-blue-500"
+                          : "border-gray-200 focus:outline-none focus:border-teal-500 focus:ring-teal-500"
                       } dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-400`}
                       required
                       aria-describedby="email-error"
@@ -88,7 +98,7 @@ const ForgotPassword = () => {
                 <button
                   type="submit"
                   disabled={!isDirty || !isValid}
-                  className="w-full py-3 px-4 inline-flex justify-center items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none"
+                  className="w-full py-3 px-4 inline-flex justify-center items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent bg-teal-600 text-white hover:bg-teal-700 disabled:opacity-50 disabled:pointer-events-none"
                 >
                   Reset password
                 </button>
@@ -101,4 +111,11 @@ const ForgotPassword = () => {
   );
 };
 
-export default ForgotPassword;
+const mapStateToProps = (state) => {
+  return {
+    access_token: state.auth.access_token,
+    user: state.auth.user,
+  };
+};
+
+export default connect(mapStateToProps)(ForgotPassword);

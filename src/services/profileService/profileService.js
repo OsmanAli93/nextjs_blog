@@ -2,7 +2,6 @@ import axiosInstance from "../axiosInstance";
 
 const profileService = {
   update: async (id, data) => {
-    console.log("service", data);
     try {
       const response = await axiosInstance.post(`/profile/${id}}`, data, {
         headers: {
