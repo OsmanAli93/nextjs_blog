@@ -36,7 +36,11 @@ const Header = ({ access_token, user, logout }) => {
             label={
               <Avatar
                 alt="User settings"
-                img="https://flowbite.com/docs/images/people/profile-picture-5.jpg"
+                img={
+                  user?.profile?.avatar === null
+                    ? ""
+                    : `http://localhost:8000/images/avatars/${user.profile.avatar}`
+                }
                 rounded
               />
             }
