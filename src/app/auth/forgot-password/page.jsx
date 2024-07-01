@@ -1,9 +1,11 @@
 "use client";
 import Link from "next/link";
-import React, { useLayoutEffect } from "react";
+import React, { useLayoutEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { connect } from "react-redux";
 import { useRouter } from "next/navigation";
+import authService from "../../../services/authService/authService";
+import Spinner from "../../../components/Spinner/Spinner";
 
 const ForgotPassword = ({ access_token, user }) => {
   const {
@@ -11,6 +13,10 @@ const ForgotPassword = ({ access_token, user }) => {
     handleSubmit,
     formState: { errors, isDirty, isValid },
   } = useForm({ mode: "onChange" });
+
+  const [pending, setPending] = useState(false);
+  const [success, setSuccess] = useState("");
+  const [error, setError] = useState("");
 
   const router = useRouter();
 
@@ -25,8 +31,27 @@ const ForgotPassword = ({ access_token, user }) => {
     }
   }, []);
 
-  const onSubmit = (data) => {
-    console.log(data);
+  const onSubmit = async (data) => {
+    setPending(true);
+    const results = await authService.forgotPassword(data);
+
+    console.log(results);
+
+    if (results?.code === "ERR_NETWORK") {
+      setError(results.message);
+      setPending(false);
+    }
+
+    if (results?.status >= 200 && results.status < 400) {
+      setSuccess(results.data.message);
+      setPending(false);
+    }
+
+    if (results?.response?.status >= 400 && results?.response?.status < 600) {
+      setError(results.data.message);
+      setPending(false);
+    }
+
     // Add your form submission logic here
   };
 
@@ -52,6 +77,8 @@ const ForgotPassword = ({ access_token, user }) => {
           <div className="mt-5">
             <form onSubmit={handleSubmit(onSubmit)}>
               <div className="grid gap-y-4">
+                {success && <p className="text-sm text-green-500">{success}</p>}
+
                 <div>
                   <label
                     htmlFor="email"
@@ -97,10 +124,14 @@ const ForgotPassword = ({ access_token, user }) => {
 
                 <button
                   type="submit"
-                  disabled={!isDirty || !isValid}
+                  disabled={!isDirty || !isValid || pending}
                   className="w-full py-3 px-4 inline-flex justify-center items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent bg-teal-600 text-white hover:bg-teal-700 disabled:opacity-50 disabled:pointer-events-none"
                 >
-                  Reset password
+                  {pending ? (
+                    <Spinner color="teal" />
+                  ) : (
+                    <span>Reset Password</span>
+                  )}
                 </button>
               </div>
             </form>

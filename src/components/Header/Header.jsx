@@ -9,7 +9,6 @@ import axiosInstance from "../../services/axiosInstance";
 
 const Header = ({ access_token, user, logout }) => {
   const router = useRouter();
-  console.log(user);
 
   const setDefaultHeaders = (access_token) => {
     axiosInstance.defaults.headers.common.Authorization = `Bearer ${access_token}`;

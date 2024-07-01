@@ -12,7 +12,6 @@ const authService = {
   },
   login: async (user) => {
     try {
-      console.log(user);
       const response = await axiosInstance.post("/login", user);
 
       return response;
@@ -22,7 +21,21 @@ const authService = {
   },
   forgotPassword: async (email) => {
     try {
-    } catch (error) {}
+      const response = await axiosInstance.post("/forgot-password", email);
+
+      return response;
+    } catch (error) {
+      return error;
+    }
+  },
+  resetPassword: async (data) => {
+    try {
+      const response = await axiosInstance.patch("/reset-password", data);
+
+      return response;
+    } catch (error) {
+      return error;
+    }
   },
   logout: async () => {
     try {
