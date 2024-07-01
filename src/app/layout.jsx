@@ -2,6 +2,7 @@ import { ThemeModeScript } from "flowbite-react";
 import { Inter } from "next/font/google";
 import "../styles/globals.css";
 import { Providers } from "../store/provider";
+import NextTopLoader from "nextjs-toploader";
 
 import Header from "../components/Header/Header";
 
@@ -19,6 +20,7 @@ export default function RootLayout({ children }) {
         <ThemeModeScript />
       </head>
       <body className={`${inter.className} bg-gray-100`}>
+        <NextTopLoader />
         <Providers>
           <Header />
           {children}

@@ -7,7 +7,7 @@ import Loader from "../components/Loader/Loader";
 export function Providers({ children }) {
   return (
     <Provider store={store}>
-      <PersistGate loading={<Loader />} persistor={persistor}>
+      <PersistGate persistor={persistor} loading={<Loader />}>
         {children}
       </PersistGate>
     </Provider>
