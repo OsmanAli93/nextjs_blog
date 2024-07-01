@@ -34,11 +34,12 @@ function* registerUser(action) {
   if (results?.status >= 200 && results.status < 400) {
     yield put({
       type: REGISTER_SUCCESS,
-      payload: results.data.token,
+      payload: results.data.access_token,
+      user: results.data.user,
       success: results.data.message,
     });
 
-    return action.router.push("/");
+    return action.router.push("/email/verify");
   }
 
   if (results?.response.status >= 400 && results.response.status < 600) {

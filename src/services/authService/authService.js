@@ -20,6 +20,10 @@ const authService = {
       return error;
     }
   },
+  forgotPassword: async (email) => {
+    try {
+    } catch (error) {}
+  },
   logout: async () => {
     try {
       const response = await axiosInstance.post("/logout", null);

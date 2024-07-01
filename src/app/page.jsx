@@ -32,7 +32,7 @@ const Home = ({ access_token, success, error, user, getUser }) => {
 
       {success !== "" && <Toast success={true} message={success} />}
       {error !== "" && <Toast error={true} message={error} />}
-      {search && user.email_verified_at && (
+      {search && user?.email_verified_at && (
         <Toast success={true} message="Email successfully verified" />
       )}
     </section>

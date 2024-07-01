@@ -1,15 +1,27 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useLayoutEffect } from "react";
 import emailVerificationService from "../../../services/emailVerificationService/emailVerificationService";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { connect } from "react-redux";
 import axiosInstance from "../../../services/axiosInstance";
-import { Spinner } from "flowbite-react";
 
-const EmailVerify = ({ access_token }) => {
+const EmailVerify = ({ access_token, user }) => {
   const [pending, setPending] = useState(false);
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
+
+  const router = useRouter();
+
+  useLayoutEffect(() => {
+    if (!access_token && !user) {
+      return router.push("/");
+    }
+
+    if (user?.email_verified_at !== null) {
+      return router.push("/");
+    }
+  }, []);
 
   const setDefaultHeaders = (access_token) => {
     axiosInstance.defaults.headers.common.Authorization = `Bearer ${access_token}`;
@@ -86,6 +98,7 @@ const EmailVerify = ({ access_token }) => {
 const mapStateToProps = (state) => {
   return {
     access_token: state.auth.access_token,
+    user: state.auth.user,
   };
 };
 
