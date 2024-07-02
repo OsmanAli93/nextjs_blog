@@ -14,6 +14,8 @@ const Header = ({ access_token, user, logout }) => {
     axiosInstance.defaults.headers.common.Authorization = `Bearer ${access_token}`;
   };
 
+  console.log(user);
+
   return (
     <Navbar rounded>
       <Navbar.Brand href="/">

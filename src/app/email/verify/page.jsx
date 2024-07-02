@@ -5,11 +5,12 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { connect } from "react-redux";
 import axiosInstance from "../../../services/axiosInstance";
+import Toast from "../../../components/Toast/Toast";
 
-const EmailVerify = ({ access_token, user }) => {
+const EmailVerify = ({ access_token, user, success, error }) => {
   const [pending, setPending] = useState(false);
-  const [success, setSuccess] = useState("");
-  const [error, setError] = useState("");
+  const [emailResent, setEmailResent] = useState("");
+  const [emailNotResent, setEmailNotResent] = useState("");
 
   const router = useRouter();
 
@@ -21,11 +22,13 @@ const EmailVerify = ({ access_token, user }) => {
     if (user?.email_verified_at !== null) {
       return router.push("/");
     }
-  }, []);
+  }, [user]);
 
   const setDefaultHeaders = (access_token) => {
     axiosInstance.defaults.headers.common.Authorization = `Bearer ${access_token}`;
   };
+
+  console.log(user);
 
   return (
     <section className="h-screen">
@@ -42,11 +45,13 @@ const EmailVerify = ({ access_token, user }) => {
             we will gladly send you another.
           </p>
 
-          {success !== "" && (
-            <p className="mb-4 text-sm text-green-500">{success}</p>
+          {emailResent !== "" && (
+            <p className="mb-4 text-sm text-green-500">{emailResent}</p>
           )}
 
-          {error !== "" && <p className="mb-4 text-sm text-red-500">{error}</p>}
+          {emailNotResent !== "" && (
+            <p className="mb-4 text-sm text-red-500">{emailNotResent}</p>
+          )}
 
           <div className="flex justify-between items-center">
             <button
@@ -60,12 +65,12 @@ const EmailVerify = ({ access_token, user }) => {
                 const results = await emailVerificationService.resend();
 
                 if (results?.code === "ERR_NETWORK") {
-                  setError(results.message);
+                  setEmailNotResent(results.message);
                   setPending(false);
                 }
 
                 if (results?.status >= 200 && results.status < 400) {
-                  setSuccess(results.data.message);
+                  setEmailResent(results.data.message);
                   setPending(false);
                 }
 
@@ -73,7 +78,7 @@ const EmailVerify = ({ access_token, user }) => {
                   results?.response?.status >= 400 &&
                   results?.response?.status < 600
                 ) {
-                  setError(results.data.message);
+                  setEmailNotResent(results.data.message);
                   setPending(false);
                 }
               }}
@@ -84,13 +89,16 @@ const EmailVerify = ({ access_token, user }) => {
               <Link href="/profile" className="text-sm text-gray-600 underline">
                 Edit Profile
               </Link>
-              <Link href="/profile" className="text-sm text-gray-600 underline">
+              <Link href="#" className="text-sm text-gray-600 underline">
                 Log Out
               </Link>
             </div>
           </div>
         </div>
       </div>
+
+      {success !== "" && <Toast success={true} message={success} />}
+      {error !== "" && <Toast error={true} message={error} />}
     </section>
   );
 };
@@ -99,6 +107,8 @@ const mapStateToProps = (state) => {
   return {
     access_token: state.auth.access_token,
     user: state.auth.user,
+    success: state.auth.successMessage,
+    error: state.auth.errorMessage,
   };
 };
 
