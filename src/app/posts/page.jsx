@@ -4,12 +4,14 @@ import { useForm } from "react-hook-form";
 import { connect } from "react-redux";
 import { useRouter } from "next/navigation";
 import { Button, FileInput, Label, TextInput } from "flowbite-react";
+import { CREATE_POST, LOADING } from "../../constants/index";
+import axiosInstance from "../../services/axiosInstance";
 
 import dynamic from "next/dynamic";
 const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
 import "react-quill/dist/quill.snow.css";
 
-const Post = ({ access_token, user }) => {
+const Post = ({ access_token, user, create, pending, error }) => {
   const {
     register,
     handleSubmit,
@@ -19,7 +21,7 @@ const Post = ({ access_token, user }) => {
     formState: { errors, isDirty, isValid },
   } = useForm();
 
-  const redirect = useRouter();
+  const router = useRouter();
 
   const modules = {
     toolbar: [
@@ -47,15 +49,33 @@ const Post = ({ access_token, user }) => {
 
   const editorContent = watch("message");
 
+  const setDefaultHeaders = (access_token) => {
+    axiosInstance.defaults.headers.common.Authorization = `Bearer ${access_token}`;
+  };
   const onSubmit = (data) => {
+    const content = {
+      thumbnail: data.thumbnail[0],
+      title: data.title,
+      description: data.description,
+      message: data.message,
+    };
+
+    setDefaultHeaders(access_token);
+    create(content, router);
     console.log(data);
   };
+
+  console.log(access_token);
 
   return (
     <section className="py-[90px]">
       <div className="container">
         <div className="max-w-4xl mx-auto bg-white border border-gray-200 rounded-xl shadow-sm dark:bg-neutral-900 dark:border-neutral-700">
-          <form className="p-6" onSubmit={handleSubmit(onSubmit)}>
+          <form
+            className="p-6"
+            onSubmit={handleSubmit(onSubmit)}
+            encType="multipart/form"
+          >
             <h2 className="text-xl font-semibold leading-7 mb-6 text-gray-900">
               Write An Article
             </h2>
@@ -153,7 +173,14 @@ const mapStateToProps = (state) => {
   return {
     access_token: state.auth.access_token,
     user: state.auth.user,
+    error: state.post.errorMessage,
   };
 };
 
-export default connect(mapStateToProps)(Post);
+const mapDispatchToProps = (dispatch) => {
+  return {
+    create: (data, router) => dispatch({ type: CREATE_POST, data, router }),
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Post);

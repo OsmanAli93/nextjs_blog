@@ -22,7 +22,7 @@ const Home = ({ access_token, success, error, user, getUser }) => {
     }
   }, []);
 
-  console.log(search);
+  console.log(success);
 
   return (
     <section className="py-[90px]">
@@ -43,7 +43,7 @@ const mapStateToProps = (state) => {
   return {
     access_token: state.auth.access_token,
     user: state.auth.user,
-    success: state.auth.successMessage,
+    success: state.auth.successMessage || state.post.successMessage,
     error: state.auth.errorMessage,
   };
 };

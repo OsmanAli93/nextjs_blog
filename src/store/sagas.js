@@ -14,12 +14,17 @@ import {
   GET_USER,
   GET_USER_SUCCESS,
   GET_USER_FAILED,
+  CREATE_POST,
+  CREATE_POST_SUCCESS,
+  CREATE_POST_FAILED,
 } from "../constants";
 
 import { takeLatest, takeEvery, put, call } from "redux-saga/effects";
+
 import authService from "../services/authService/authService";
 import profileService from "../services/profileService/profileService";
 import userService from "../services/userService/userService";
+import postService from "../services/postService/postService,";
 
 function* registerUser(action) {
   const results = yield call(authService.register, action.data);
@@ -162,12 +167,41 @@ function* getUser(action) {
   }
 }
 
+function* createPost(action) {
+  const results = yield call(postService.create, action.data);
+
+  if (results?.code === "ERR_NETWORK") {
+    yield put({
+      type: CREATE_POST_FAILED,
+      error: results.message,
+    });
+  }
+
+  if (results?.status >= 200 && results.status < 400) {
+    yield put({
+      type: CREATE_POST_SUCCESS,
+      success: results.data.message,
+    });
+
+    return action.router.push("/");
+  }
+
+  if (results?.response.status >= 400 && results.response.status < 600) {
+    console.log(results);
+    yield put({
+      type: CREATE_POST_FAILED,
+      error: results.response.data.message,
+    });
+  }
+}
+
 function* sagaWatcher() {
   yield takeLatest(REGISTER_USER, registerUser);
   yield takeLatest(LOGIN_USER, loginUser);
   yield takeLatest(LOGOUT_USER, logoutUser);
   yield takeLatest(UPDATE_PROFILE, updateProfile);
   yield takeEvery(GET_USER, getUser);
+  yield takeLatest(CREATE_POST, createPost);
 }
 
 export default sagaWatcher;
