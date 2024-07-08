@@ -28,9 +28,18 @@
   border-color: red;
 }
 
+.ql-align-center {
+  text-align: center;
+}
+
 .cutoff-text {
   display: -webkit-box;
   overflow: hidden;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
+}
+
+#single-article img {
+  width: 100%;
+  padding: 1rem 0;
 }

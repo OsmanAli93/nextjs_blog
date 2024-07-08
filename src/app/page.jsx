@@ -22,7 +22,7 @@ const Home = ({ access_token, success, error, user, getUser }) => {
 
   const fetchPosts = useCallback(async () => {
     setPending(true);
-    const results = await postService.fetch();
+    const results = await postService.posts();
 
     if (results?.code === "ERR_NETWORK") {
       setPending(false);
