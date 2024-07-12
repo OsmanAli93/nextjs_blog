@@ -7,18 +7,21 @@ import { useSearchParams } from "next/navigation";
 import { GET_USER } from "../constants";
 import axiosInstance from "../services/axiosInstance";
 import postService from "../services/postService/postService,";
+import { Spinner } from "flowbite-react";
 
 const Home = ({ access_token, success, error, user, getUser }) => {
   const searchParams = useSearchParams();
   const search = searchParams?.get("verified");
 
   const [posts, setPosts] = useState([]);
-  const [pending, setPending] = useState(false);
   const [errorPosts, setErrorPosts] = useState("");
+  const [pending, setPending] = useState(false);
 
   const setDefaultHeaders = (access_token) => {
     axiosInstance.defaults.headers.common.Authorization = `Bearer ${access_token}`;
   };
+
+  console.log(access_token);
 
   const fetchPosts = useCallback(async () => {
     setPending(true);
@@ -36,7 +39,7 @@ const Home = ({ access_token, success, error, user, getUser }) => {
 
     if (results?.response?.status >= 400 && results?.response?.status < 600) {
       setPending(false);
-      setErrorPosts(results.data.message);
+      setErrorPosts(results.response.data.message);
     }
   }, []);
 
@@ -50,6 +53,16 @@ const Home = ({ access_token, success, error, user, getUser }) => {
   }, [fetchPosts]);
 
   console.log(posts);
+
+  if (pending) {
+    return (
+      <div className="h-screen w-full flex justify-center items-center">
+        <div className="text-center">
+          <Spinner aria-label="Center-aligned spinner" size="lg" />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <section className="py-[90px]">
