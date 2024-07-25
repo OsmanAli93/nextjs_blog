@@ -2,12 +2,19 @@
 import React, { useEffect, useCallback, useState } from "react";
 import { useParams } from "next/navigation";
 import postService from "../../../services/postService/postService,";
+import axiosInstance from "../../../services/axiosInstance";
 import moment from "moment";
+import { connect } from "react-redux";
 import parse from "html-react-parser";
-import { TbThumbUp, TbThumbDown } from "react-icons/tb";
+import {
+  TbThumbUp,
+  TbThumbDown,
+  TbThumbUpFilled,
+  TbThumbDownFilled,
+} from "react-icons/tb";
 import { Spinner } from "flowbite-react";
 
-const Article = () => {
+const Article = ({ access_token, user }) => {
   const { slug } = useParams();
 
   const [article, setArticle] = useState(null);
@@ -34,6 +41,21 @@ const Article = () => {
     }
   }, []);
 
+  const setDefaultHeaders = (access_token) => {
+    axiosInstance.defaults.headers.common.Authorization = `Bearer ${access_token}`;
+  };
+
+  const handleLike = async () => {
+    setDefaultHeaders(access_token);
+    const result = await postService.like(slug);
+
+    setArticle(result.data.post);
+
+    console.log(result);
+  };
+
+  const likedByUser = article?.likes?.find((like) => like.user_id === user.id);
+
   useEffect(() => {
     fetchPost();
   }, [slug, fetchPost]);
@@ -47,8 +69,6 @@ const Article = () => {
       </div>
     );
   }
-
-  console.log(article);
 
   return (
     <section className="py-[90px]">
@@ -93,13 +113,37 @@ const Article = () => {
             </div>
 
             <div className="flex items-center gap-6 mb-12">
-              <button type="button" title="I Like This Post">
-                <TbThumbUp size={40} />
-              </button>
+              {likedByUser ? (
+                <div>
+                  <button
+                    type="button"
+                    className="flex items-center"
+                    title="I Like This Post"
+                  >
+                    <TbThumbUpFilled size={40} />
+                    {article?.likes?.length > 0 && (
+                      <span className="text-sm pl-1">
+                        {article.likes.length}
+                      </span>
+                    )}
+                  </button>
+                </div>
+              ) : (
+                <div>
+                  <button
+                    type="button"
+                    title="I Like This Post"
+                    onClick={() => handleLike()}
+                  >
+                    <TbThumbUp size={40} />
+                  </button>
+                </div>
+              )}
+
               <button
                 type="button"
                 title="I Dislike This Post"
-                className="pt-2"
+                className="pt-1"
               >
                 <TbThumbDown size={40} />
               </button>
@@ -138,4 +182,11 @@ const Article = () => {
   );
 };
 
-export default Article;
+const mapStateToProps = (state) => {
+  return {
+    access_token: state.auth.access_token,
+    user: state.auth.user,
+  };
+};
+
+export default connect(mapStateToProps)(Article);

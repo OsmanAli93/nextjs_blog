@@ -30,6 +30,14 @@ const postService = {
       return error;
     }
   },
+  like: async (slug) => {
+    try {
+      const response = await axiosInstance.post(`/posts/${slug}/likes`, null);
+      return response;
+    } catch (error) {
+      return error;
+    }
+  },
 };
 
 export default postService;
