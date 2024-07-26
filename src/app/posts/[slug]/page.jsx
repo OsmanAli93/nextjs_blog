@@ -13,6 +13,7 @@ import {
   TbThumbDownFilled,
 } from "react-icons/tb";
 import { Spinner } from "flowbite-react";
+import Link from "next/link";
 
 const Article = ({ access_token, user }) => {
   const { slug } = useParams();
@@ -54,7 +55,16 @@ const Article = ({ access_token, user }) => {
     console.log(result);
   };
 
-  const likedByUser = article?.likes?.find((like) => like.user_id === user.id);
+  const handleUnlike = async () => {
+    setDefaultHeaders(access_token);
+    const result = await postService.unlike(slug);
+
+    setArticle(result.data.post);
+
+    console.log(result);
+  };
+
+  const likedByUser = article?.likes?.find((like) => like.user_id === user?.id);
 
   useEffect(() => {
     fetchPost();
@@ -113,31 +123,48 @@ const Article = ({ access_token, user }) => {
             </div>
 
             <div className="flex items-center gap-6 mb-12">
-              {likedByUser ? (
-                <div>
-                  <button
-                    type="button"
-                    className="flex items-center"
-                    title="I Like This Post"
-                  >
-                    <TbThumbUpFilled size={40} />
-                    {article?.likes?.length > 0 && (
-                      <span className="text-sm pl-1">
-                        {article.likes.length}
-                      </span>
-                    )}
-                  </button>
-                </div>
+              {access_token == null && user === null ? (
+                <>
+                  <div>
+                    <Link
+                      href="/auth/login"
+                      className="flex items-center"
+                      title="I Like This Post"
+                    >
+                      <TbThumbUp size={40} />
+                    </Link>
+                  </div>
+                </>
               ) : (
-                <div>
-                  <button
-                    type="button"
-                    title="I Like This Post"
-                    onClick={() => handleLike()}
-                  >
-                    <TbThumbUp size={40} />
-                  </button>
-                </div>
+                <>
+                  {likedByUser ? (
+                    <div>
+                      <button
+                        type="button"
+                        className="flex items-center"
+                        title="I Like This Post"
+                        onClick={() => handleUnlike()}
+                      >
+                        <TbThumbUpFilled size={40} />
+                        {article?.likes?.length > 0 && (
+                          <span className="text-sm pl-1">
+                            {article.likes.length}
+                          </span>
+                        )}
+                      </button>
+                    </div>
+                  ) : (
+                    <div>
+                      <button
+                        type="button"
+                        title="I Like This Post"
+                        onClick={() => handleLike()}
+                      >
+                        <TbThumbUp size={40} />
+                      </button>
+                    </div>
+                  )}
+                </>
               )}
 
               <button

@@ -38,6 +38,14 @@ const postService = {
       return error;
     }
   },
+  unlike: async (slug) => {
+    try {
+      const response = await axiosInstance.delete(`/posts/${slug}/likes`);
+      return response;
+    } catch (error) {
+      return error;
+    }
+  },
 };
 
 export default postService;
