@@ -2,6 +2,7 @@
 import React, { useEffect, useCallback, useState } from "react";
 import { useParams } from "next/navigation";
 import postService from "../../../services/postService/postService,";
+import commentService from "../../../services/commentService/commentService";
 import axiosInstance from "../../../services/axiosInstance";
 import moment from "moment";
 import { connect } from "react-redux";
@@ -14,6 +15,7 @@ import {
 } from "react-icons/tb";
 import { Spinner } from "flowbite-react";
 import Link from "next/link";
+import { useForm } from "react-hook-form";
 
 const Article = ({ access_token, user }) => {
   const { slug } = useParams();
@@ -21,6 +23,12 @@ const Article = ({ access_token, user }) => {
   const [article, setArticle] = useState(null);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState("");
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
 
   const fetchPost = useCallback(async () => {
     setPending(true);
@@ -60,6 +68,16 @@ const Article = ({ access_token, user }) => {
     const result = await postService.unlike(slug);
 
     setArticle(result.data.post);
+
+    console.log(result);
+  };
+
+  const onSubmit = async () => {
+    setDefaultHeaders(access_token);
+    const result = await commentService.create(slug, {
+      user_id: user.id,
+      comment: "adsasdasdasdasd",
+    });
 
     console.log(result);
   };
@@ -181,7 +199,7 @@ const Article = ({ access_token, user }) => {
                 Discussion (20)
               </h2>
               <div className="add-comment">
-                <form>
+                <form onSubmit={handleSubmit(onSubmit)}>
                   <div className="px-4 py-2 mb-4 border rounded-lg border-gray-100 bg-white rounded-t-lg dark:bg-gray-800">
                     <label htmlFor="comment" className="sr-only">
                       Your comment
