@@ -13,6 +13,15 @@ const commentService = {
       return error;
     }
   },
+  fetch: async (slug) => {
+    try {
+      const response = await axiosInstance.get(`/posts/${slug}/comments`);
+
+      return response;
+    } catch (error) {
+      return error;
+    }
+  },
 };
 
 export default commentService;
