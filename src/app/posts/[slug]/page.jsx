@@ -1,5 +1,11 @@
 "use client";
-import React, { useEffect, useCallback, useState } from "react";
+import React, {
+  useEffect,
+  useCallback,
+  useState,
+  useRef,
+  Fragment,
+} from "react";
 import { useParams } from "next/navigation";
 import postService from "../../../services/postService/postService,";
 import commentService from "../../../services/commentService/commentService";
@@ -13,7 +19,7 @@ import {
   TbThumbUpFilled,
   TbThumbDownFilled,
 } from "react-icons/tb";
-import { Spinner } from "flowbite-react";
+import { Avatar, Spinner } from "flowbite-react";
 import Toast from "../../../components/Toast/Toast";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
@@ -28,6 +34,7 @@ const Article = ({ access_token, user }) => {
   const [onComment, setOnComment] = useState(false);
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
+  const [value, setValue] = useState("");
 
   const {
     register,
@@ -67,8 +74,8 @@ const Article = ({ access_token, user }) => {
 
     if (results?.status >= 200 && results.status < 400) {
       setPending(false);
-      setComments(results.data.comments);
-      console.log(results);
+      setComments(results.data.comments.comments);
+      console.log("result", results);
     }
 
     if (results?.response?.status >= 400 && results?.response?.status < 600) {
@@ -86,8 +93,6 @@ const Article = ({ access_token, user }) => {
     const result = await postService.like(slug);
 
     setArticle(result.data.post);
-
-    console.log(result);
   };
 
   const handleUnlike = async () => {
@@ -95,8 +100,6 @@ const Article = ({ access_token, user }) => {
     const result = await postService.unlike(slug);
 
     setArticle(result.data.post);
-
-    console.log(result);
   };
 
   const onSubmit = async (data) => {
@@ -104,11 +107,30 @@ const Article = ({ access_token, user }) => {
     setOnComment(true);
     const results = await commentService.create(slug, {
       user_id: user.id,
-      parent_id: null,
       comment: data.comment,
     });
-
     reset();
+    if (results?.code === "ERR_NETWORK") {
+      setOnComment(false);
+      setError(results.message);
+    }
+    if (results?.status >= 200 && results.status < 400) {
+      setOnComment(false);
+      setSuccess(results.data.message);
+      setComments(results.data.comments.comments);
+      console.log(results);
+    }
+    if (results?.response?.status >= 400 && results?.response?.status < 600) {
+      setOnComment(false);
+      setError(results.response.message);
+    }
+  };
+
+  const onSubmitReply = async (data) => {
+    setDefaultHeaders(access_token);
+    setOnComment(true);
+
+    const results = await commentService.create(slug, data);
 
     if (results?.code === "ERR_NETWORK") {
       setOnComment(false);
@@ -118,6 +140,7 @@ const Article = ({ access_token, user }) => {
     if (results?.status >= 200 && results.status < 400) {
       setOnComment(false);
       setSuccess(results.data.message);
+      setComments(results.data.comments.comments);
       console.log(results);
     }
 
@@ -125,8 +148,191 @@ const Article = ({ access_token, user }) => {
       setOnComment(false);
       setError(results.response.message);
     }
+  };
 
-    console.log(data.comment);
+  const Comment = ({ comment }) => {
+    const [isReply, setIsReply] = useState(false);
+    const inputRef = useRef(null);
+
+    return (
+      <div className="my-6">
+        <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center">
+            <Avatar
+              alt="User"
+              img={
+                comment?.user.profile.avatar === null
+                  ? ""
+                  : `http://localhost:8000/images/avatars/${comment.user.profile.avatar}`
+              }
+              rounded
+              className="mr-2 text-sm font-semibold"
+            />
+            {comment.user.name}
+
+            <p className="text-gray-600 text-sm">
+              {format(comment.created_at, "MMM. d, yyyy")}
+            </p>
+          </div>
+        </div>
+        <div>{comment.comment}</div>
+        <div className="mt-4">
+          <button
+            className="font-medium text-sm text-gray-500"
+            onClick={() => setIsReply(!isReply)}
+          >
+            Reply
+          </button>
+        </div>
+
+        {isReply && (
+          <div className="add-reply mt-2">
+            <div className="px-4 py-2 mb-4 border rounded-lg border-gray-100 bg-white rounded-t-lg dark:bg-gray-800">
+              <label htmlFor="comment" className="sr-only">
+                Your reply
+              </label>
+              <textarea
+                name={comment.id}
+                rows="4"
+                className="w-full px-0 text-sm text-gray-900 bg-white border-0 dark:bg-gray-800 focus:ring-0 dark:text-white dark:placeholder-gray-400"
+                placeholder="Write a reply..."
+                ref={inputRef}
+              ></textarea>
+            </div>
+            <div>
+              <button
+                type="button"
+                className="text-white bg-gradient-to-r from-cyan-400 via-cyan-500 to-cyan-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-cyan-300 dark:focus:ring-cyan-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 mb-2"
+                onClick={() => {
+                  const data = {
+                    user_id: user.id,
+                    comment: inputRef.current.value,
+                  };
+
+                  onSubmitReply(data);
+                  inputRef.current.value = "";
+                }}
+              >
+                Post reply
+              </button>
+              <button
+                type="button"
+                className="font-medium text-sm text-gray-500"
+                onClick={() => {
+                  setIsReply(false);
+                  inputRef.current.value = "";
+                }}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        )}
+
+        {comment.replies &&
+          comment.replies.length > 0 &&
+          comment.replies.map((reply) => (
+            <Fragment key={reply.id}>
+              <Replies key={reply.id} reply={reply} parent_id={comment.id} />
+            </Fragment>
+          ))}
+      </div>
+    );
+  };
+
+  const Replies = ({ reply, parent_id }) => {
+    const [isReply, setIsReply] = useState(false);
+    const inputRef = useRef(null);
+
+    return (
+      <>
+        <div key={reply.id} className="my-6 mx-8">
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center">
+              <Avatar
+                alt="User"
+                img={
+                  reply?.user.profile.avatar === null
+                    ? ""
+                    : `http://localhost:8000/images/avatars/${reply.user.profile.avatar}`
+                }
+                rounded
+                className="mr-2 text-sm font-semibold"
+              />
+              {reply.user.name}
+
+              <p className="text-gray-600 text-sm">
+                {format(reply.created_at, "MMM. d, yyyy")}
+              </p>
+            </div>
+          </div>
+          <div className="py-2">{reply.comment}</div>
+          <div className="mb-6">
+            <button
+              className="font-medium text-sm text-gray-500"
+              onClick={() => setIsReply(!isReply)}
+            >
+              Reply
+            </button>
+          </div>
+
+          {isReply && (
+            <>
+              <div className="add-reply">
+                <div className="px-4 py-2 mb-4 border rounded-lg border-gray-100 bg-white rounded-t-lg dark:bg-gray-800">
+                  <label htmlFor="comment" className="sr-only">
+                    Your reply
+                  </label>
+                  <textarea
+                    name={reply.id}
+                    rows="4"
+                    className="w-full px-0 text-sm text-gray-900 bg-white border-0 dark:bg-gray-800 focus:ring-0 dark:text-white dark:placeholder-gray-400"
+                    placeholder="Write a reply..."
+                    ref={inputRef}
+                  ></textarea>
+                </div>
+                <div>
+                  <button
+                    type="button"
+                    className="text-white bg-gradient-to-r from-cyan-400 via-cyan-500 to-cyan-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-cyan-300 dark:focus:ring-cyan-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 mb-2"
+                    onClick={() => {
+                      const data = {
+                        user_id: user.id,
+                        parent_id: parent_id,
+                        comment: inputRef.current.value,
+                      };
+
+                      onSubmitReply(data);
+                      inputRef.current.value = "";
+                    }}
+                  >
+                    Post reply
+                  </button>
+                  <button
+                    type="button"
+                    className="font-medium text-sm text-gray-500"
+                    onClick={() => {
+                      setIsReply(false);
+                      inputRef.current.value = "";
+                    }}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            </>
+          )}
+        </div>
+
+        {reply.replies &&
+          reply.replies.length > 0 &&
+          reply.replies.map((reply) => (
+            <Fragment key={reply.id}>
+              <Replies reply={reply} parent_id={parent_id} />
+            </Fragment>
+          ))}
+      </>
+    );
   };
 
   const likedByUser = article?.likes?.find((like) => like.user_id === user?.id);
@@ -135,8 +341,6 @@ const Article = ({ access_token, user }) => {
     fetchPost();
     fetchComments();
   }, [slug, fetchPost, fetchComments]);
-
-  console.log(comments);
 
   if (pending) {
     return (
@@ -246,7 +450,7 @@ const Article = ({ access_token, user }) => {
 
             <div className="comment-section pb-32">
               <h2 className="text-lg lg:text-2xl font-bold text-gray-900 mb-6 dark:text-white">
-                Discussion (20)
+                Discussion ({comments?.length})
               </h2>
               {onComment ? (
                 <div className="w-full flex justify-center items-center">
@@ -256,7 +460,7 @@ const Article = ({ access_token, user }) => {
                 </div>
               ) : (
                 <div className="add-comment">
-                  <form onSubmit={handleSubmit(onSubmit)}>
+                  <form key={1} onSubmit={handleSubmit(onSubmit)}>
                     <div className="px-4 py-2 mb-4 border rounded-lg border-gray-100 bg-white rounded-t-lg dark:bg-gray-800">
                       <label htmlFor="comment" className="sr-only">
                         Your comment
@@ -282,30 +486,11 @@ const Article = ({ access_token, user }) => {
               )}
 
               <div className="comments">
-                {comments?.data?.length > 0 &&
-                  comments.data.map((comment) => (
-                    <div key={comment.id} className="my-6">
-                      <div className="flex items-center justify-between mb-2">
-                        <div className="flex items-center">
-                          <p className="flex items-center mr-2 text-sm font-semibold">
-                            <img
-                              className="mr-2 w-6 h-6 rounded-full"
-                              src={`http://localhost:8000/images/avatars/${comment.user.profile.avatar}`}
-                            />
-                            {comment.user.name}
-                          </p>
-                          <p className="text-gray-600 text-sm">
-                            {format(comment.created_at, "MMM. d, yyyy")}
-                          </p>
-                        </div>
-                      </div>
-                      <div>{comment.comment}</div>
-                      <div className="mt-4">
-                        <button className="font-medium text-sm text-gray-500">
-                          Reply
-                        </button>
-                      </div>
-                    </div>
+                {comments?.length > 0 &&
+                  comments.map((comment, index) => (
+                    <Fragment key={index}>
+                      <Comment comment={comment} />
+                    </Fragment>
                   ))}
               </div>
             </div>
