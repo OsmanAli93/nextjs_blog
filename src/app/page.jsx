@@ -21,7 +21,7 @@ const Home = ({ access_token, success, error, user, getUser }) => {
     axiosInstance.defaults.headers.common.Authorization = `Bearer ${access_token}`;
   };
 
-  console.log(access_token);
+  console.log("home", posts);
 
   const fetchPosts = useCallback(async () => {
     setPending(true);
