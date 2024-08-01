@@ -60,30 +60,42 @@ const User = ({ access_token }) => {
   return (
     <section className="py-[90px]">
       <div className="container">
-        <div className="flex items-center gap-2 px-8">
-          <div>
-            <Avatar
-              alt="User"
-              img={
-                user?.profile.avatar === null
-                  ? ""
-                  : `http://localhost:8000/images/avatars/${user?.profile.avatar}`
-              }
-              rounded
-              size="xl"
-              className="mr-2 text-sm font-semibold"
-            />
+        <div>
+          <div className="w-full h-[160px] bg-white rounded-lg"></div>
+          <div className="flex items-center justify-center -mt-10">
+            <div className="text-center">
+              <Avatar
+                alt="User settings"
+                img={
+                  user?.profile?.avatar === null
+                    ? ""
+                    : `http://localhost:8000/images/avatars/${user.profile.avatar}`
+                }
+                rounded
+                bordered
+                color="light"
+                size="lg"
+              />
+              <h4 className="text-lg font-bold mt-2">{user?.name}</h4>
+              <div className="text-gray-600 mb-2">{user?.profile.city}</div>
+              <button className="text-white bg-cyan-700 hover:bg-cyan-800 focus:outline-none focus:ring-4 focus:ring-cyan-300 font-medium rounded-full text-sm px-8 py-2 text-center dark:bg-cyan-600 dark:hover:bg-cyan-700 dark:focus:ring-cyan-800">
+                Follow
+              </button>
+            </div>
           </div>
-          <div>
-            <p className="text-3xl font-bold">{user?.name}</p>
-            <p>
-              @{user?.profile.username}
-              <span className="px-1 text-gray-500">&#8226;</span>
-              11 followers
-              <span className="px-1 text-gray-500">&#8226;</span>
-              {user?.posts_count} posts
-            </p>
-            <p>{user?.profile.about}</p>
+          <div className="max-w-lg mx-auto flex items-center text-center mt-6">
+            <div className="flex-1">
+              <h4 className="font-bold">Followers</h4>
+              <p>2.1K</p>
+            </div>
+            <div className="flex-1">
+              <h4 className="font-bold">Posts</h4>
+              <p>2.1K</p>
+            </div>
+            <div className="flex-1">
+              <h4 className="font-bold">Likes</h4>
+              <p>2.1K</p>
+            </div>
           </div>
         </div>
 
