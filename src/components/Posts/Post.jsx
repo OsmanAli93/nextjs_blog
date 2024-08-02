@@ -71,7 +71,7 @@ const Post = ({ post, user }) => {
           {post.description}
         </p>
         <div className="text-end">
-          {pathname.split("/")[1] === page && user.id === Number(param) ? (
+          {pathname.split("/")[1] === page && user?.id === Number(param) ? (
             <div className="flex justify-end items-center gap-2">
               <button
                 type="button"

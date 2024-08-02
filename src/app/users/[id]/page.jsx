@@ -16,14 +16,10 @@ const User = ({ access_token }) => {
 
   console.log(posts);
 
-  const setDefaultHeaders = (access_token) => {
-    axiosInstance.defaults.headers.common.Authorization = `Bearer ${access_token}`;
-  };
-
-  const fetchUser = useCallback(async () => {
+  const fetchUserPosts = useCallback(async () => {
     setPending(true);
-    setDefaultHeaders(access_token);
-    const results = await userService.getUser(id);
+
+    const results = await userService.getUserPosts(id);
 
     if (results?.code === "ERR_NETWORK") {
       setPending(false);
@@ -44,8 +40,8 @@ const User = ({ access_token }) => {
   }, []);
 
   useEffect(() => {
-    fetchUser();
-  }, [fetchUser]);
+    fetchUserPosts();
+  }, [fetchUserPosts]);
 
   if (pending) {
     return (
@@ -69,7 +65,7 @@ const User = ({ access_token }) => {
                 img={
                   user?.profile?.avatar === null
                     ? ""
-                    : `http://localhost:8000/images/avatars/${user.profile.avatar}`
+                    : `http://localhost:8000/images/avatars/${user?.profile.avatar}`
                 }
                 rounded
                 bordered

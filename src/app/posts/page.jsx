@@ -62,10 +62,11 @@ const Post = ({ access_token, user, create, pending, error }) => {
 
     setDefaultHeaders(access_token);
     create(content, router);
+
     console.log(data);
   };
 
-  console.log(access_token);
+  console.log("error", error);
 
   return (
     <section className="py-[90px]">

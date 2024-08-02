@@ -190,7 +190,7 @@ function* createPost(action) {
     console.log(results);
     yield put({
       type: CREATE_POST_FAILED,
-      error: results.response.data.message,
+      error: results.response.statusText,
     });
   }
 }

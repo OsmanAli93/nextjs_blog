@@ -14,7 +14,7 @@ const Header = ({ access_token, user, logout }) => {
     axiosInstance.defaults.headers.common.Authorization = `Bearer ${access_token}`;
   };
 
-  console.log(user);
+  console.log("Header", user, access_token);
 
   return (
     <Navbar rounded>
@@ -41,7 +41,7 @@ const Header = ({ access_token, user, logout }) => {
                 img={
                   user?.profile?.avatar === null
                     ? ""
-                    : `http://localhost:8000/images/avatars/${user.profile.avatar}`
+                    : `http://localhost:8000/images/avatars/${user?.profile.avatar}`
                 }
                 rounded
               />

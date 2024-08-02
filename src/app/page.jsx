@@ -5,6 +5,7 @@ import Posts from "../components/Posts/Posts";
 import Toast from "../components/Toast/Toast";
 import { useSearchParams } from "next/navigation";
 import { GET_USER } from "../constants";
+import axios from "axios";
 import axiosInstance from "../services/axiosInstance";
 import postService from "../services/postService/postService,";
 import { Spinner } from "flowbite-react";
@@ -16,12 +17,30 @@ const Home = ({ access_token, success, error, user, getUser }) => {
   const [posts, setPosts] = useState([]);
   const [errorPosts, setErrorPosts] = useState("");
   const [pending, setPending] = useState(false);
+  const [currentPage, setCurrentPage] = useState(null);
 
   const setDefaultHeaders = (access_token) => {
     axiosInstance.defaults.headers.common.Authorization = `Bearer ${access_token}`;
   };
 
-  console.log("home", posts);
+  const fetchPaginatedPosts = async (currentPage) => {
+    const results = await axios.get(
+      `http://127.0.0.1:8000/api/posts?page=${currentPage}`
+    );
+
+    const data = await results.data.posts;
+
+    return data;
+  };
+
+  const handlePageClick = async (page) => {
+    const currentPage = page.selected + 1;
+
+    const pageFromPagination = await fetchPaginatedPosts(currentPage);
+
+    setCurrentPage(currentPage);
+    setPosts(pageFromPagination);
+  };
 
   const fetchPosts = useCallback(async () => {
     setPending(true);
@@ -52,7 +71,7 @@ const Home = ({ access_token, success, error, user, getUser }) => {
     fetchPosts();
   }, [fetchPosts]);
 
-  console.log(posts);
+  console.log(currentPage);
 
   if (pending) {
     return (
@@ -67,7 +86,11 @@ const Home = ({ access_token, success, error, user, getUser }) => {
   return (
     <section className="py-[90px]">
       <div className="container">
-        <Posts posts={posts} />
+        <Posts
+          posts={posts}
+          handlePageClick={handlePageClick}
+          currentPage={currentPage}
+        />
       </div>
 
       {success !== "" && <Toast success={true} message={success} />}
