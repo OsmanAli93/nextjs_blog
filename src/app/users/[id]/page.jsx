@@ -7,7 +7,7 @@ import { useParams } from "next/navigation";
 import { Avatar, Spinner } from "flowbite-react";
 import Posts from "../../../components/Posts/Posts";
 
-const User = ({ access_token }) => {
+const User = () => {
   const { id } = useParams();
   const [user, setUser] = useState(null);
   const [posts, setPosts] = useState([]);
@@ -57,7 +57,20 @@ const User = ({ access_token }) => {
     <section className="py-[90px]">
       <div className="container">
         <div>
-          <div className="w-full h-[160px] bg-white rounded-lg"></div>
+          {user?.profile.background_image !== null ? (
+            <div
+              style={{
+                background: "no-repeat",
+                backgroundSize: "cover",
+                backgroundPosition: "center center",
+                backgroundImage: `url(http://localhost:8000/images/backgrounds/${user?.profile.background_image})`,
+              }}
+              className="w-full h-[200px] rounded-lg"
+            ></div>
+          ) : (
+            <div className="w-full h-[160px] bg-white rounded-lg"></div>
+          )}
+
           <div className="flex items-center justify-center -mt-10">
             <div className="text-center">
               <Avatar
@@ -74,7 +87,7 @@ const User = ({ access_token }) => {
               />
               <h4 className="text-lg font-bold mt-2">{user?.name}</h4>
               <div className="text-gray-600 mb-2">{user?.profile.city}</div>
-              <button className="text-white bg-cyan-700 hover:bg-cyan-800 focus:outline-none focus:ring-4 focus:ring-cyan-300 font-medium rounded-full text-sm px-8 py-2 text-center dark:bg-cyan-600 dark:hover:bg-cyan-700 dark:focus:ring-cyan-800">
+              <button className="text-white bg-gradient-to-r from-cyan-400 via-cyan-500 to-cyan-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-cyan-300  font-medium rounded-full text-sm px-8 py-2 text-center dark:bg-cyan-600 dark:hover:bg-cyan-700 ">
                 Follow
               </button>
             </div>
@@ -85,12 +98,12 @@ const User = ({ access_token }) => {
               <p>2.1K</p>
             </div>
             <div className="flex-1">
-              <h4 className="font-bold">Posts</h4>
+              <h4 className="font-bold">Following</h4>
               <p>2.1K</p>
             </div>
             <div className="flex-1">
-              <h4 className="font-bold">Likes</h4>
-              <p>2.1K</p>
+              <h4 className="font-bold">Posts</h4>
+              <p>{posts?.total}</p>
             </div>
           </div>
         </div>
@@ -103,10 +116,4 @@ const User = ({ access_token }) => {
   );
 };
 
-const mapStateToProps = (state) => {
-  return {
-    access_token: state.auth.access_token,
-  };
-};
-
-export default connect(mapStateToProps)(User);
+export default User;

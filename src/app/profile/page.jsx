@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { connect } from "react-redux";
 import { useForm } from "react-hook-form";
 import { PhotoIcon, UserCircleIcon } from "@heroicons/react/24/solid";
+import { Avatar } from "flowbite-react";
 import { LOADING, UPDATE_PROFILE } from "../../constants";
 import Spinner from "../../components/Spinner/Spinner";
 import axiosInstance from "../../services/axiosInstance";
@@ -49,7 +50,6 @@ const Profile = ({
     pending(true);
     setDefaultHeaders(access_token);
     update(user.id, data);
-    console.log(data);
   };
 
   const onDragEnter = (e) => {
@@ -80,8 +80,6 @@ const Profile = ({
     setValue("background_image", file);
     console.log(file);
   };
-
-  console.log(success);
 
   return (
     <section className="py-[90px]">
@@ -171,9 +169,19 @@ const Profile = ({
                             src={avatarPreview}
                           />
                         ) : (
-                          <UserCircleIcon
-                            className="h-12 w-12 text-gray-300"
-                            aria-hidden="true"
+                          // <UserCircleIcon
+                          //   className="h-12 w-12 text-gray-300"
+                          //   aria-hidden="true"
+                          // />
+                          <Avatar
+                            alt="User"
+                            img={
+                              user?.profile.avatar === null
+                                ? ""
+                                : `http://localhost:8000/images/avatars/${user.profile.avatar}`
+                            }
+                            rounded
+                            className="mr-2 text-sm font-semibold"
                           />
                         )}
 
@@ -221,13 +229,14 @@ const Profile = ({
                               id="background_image"
                               {...register("background_image")}
                               type="file"
+                              accept="image/*"
                               onChange={(e) => {
                                 if (e.target.files && e.target.files[0]) {
                                   const [file] = e.target.files;
                                   setBackgroundPreview(
                                     URL.createObjectURL(file)
                                   );
-                                  setValue("background_image", file);
+                                  // setValue("background_image", file);
                                 }
                               }}
                               className="sr-only"
