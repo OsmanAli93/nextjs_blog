@@ -9,6 +9,7 @@ import axios from "axios";
 import axiosInstance from "../services/axiosInstance";
 import postService from "../services/postService/postService,";
 import { Spinner } from "flowbite-react";
+import Skeleton from "../components/Posts/Skeleton";
 
 const Home = ({ access_token, success, error, user, getUser }) => {
   const searchParams = useSearchParams();
@@ -17,6 +18,7 @@ const Home = ({ access_token, success, error, user, getUser }) => {
   const [posts, setPosts] = useState([]);
   const [errorPosts, setErrorPosts] = useState("");
   const [pending, setPending] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(null);
 
   const setDefaultHeaders = (access_token) => {
@@ -24,13 +26,25 @@ const Home = ({ access_token, success, error, user, getUser }) => {
   };
 
   const fetchPaginatedPosts = async (currentPage) => {
-    const results = await axios.get(
-      `http://127.0.0.1:8000/api/posts?page=${currentPage}`
-    );
+    setLoading(true);
+    const results = await postService.posts(currentPage);
 
-    const data = await results.data.posts;
+    if (results?.code === "ERR_NETWORK") {
+      setLoading(false);
+      setErrorPosts(results.message);
+    }
 
-    return data;
+    if (results?.status >= 200 && results.status < 400) {
+      setLoading(false);
+      return results.data.posts;
+    }
+
+    if (results?.response?.status >= 400 && results?.response?.status < 600) {
+      setLoading(false);
+      setErrorPosts(results.response.data.message);
+    }
+
+    console.log(results);
   };
 
   const handlePageClick = async (page) => {
@@ -45,6 +59,7 @@ const Home = ({ access_token, success, error, user, getUser }) => {
   const fetchPosts = useCallback(async () => {
     setPending(true);
     const results = await postService.posts();
+    console.log(results);
 
     if (results?.code === "ERR_NETWORK") {
       setPending(false);
@@ -71,7 +86,7 @@ const Home = ({ access_token, success, error, user, getUser }) => {
     fetchPosts();
   }, [fetchPosts]);
 
-  console.log(currentPage);
+  console.log(posts.data);
 
   if (pending) {
     return (
@@ -87,6 +102,7 @@ const Home = ({ access_token, success, error, user, getUser }) => {
     <section className="py-[90px]">
       <div className="container">
         <Posts
+          loading={loading}
           posts={posts}
           handlePageClick={handlePageClick}
           currentPage={currentPage}

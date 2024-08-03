@@ -1,9 +1,10 @@
 import axiosInstance from "../axiosInstance";
 
 const postService = {
-  posts: async () => {
+  posts: async (page) => {
     try {
-      const response = await axiosInstance.get("/posts");
+      const pathUrl = page ? `/posts/?page=${page}` : "/posts";
+      const response = await axiosInstance.get(pathUrl);
       return response;
     } catch (error) {
       return error;
