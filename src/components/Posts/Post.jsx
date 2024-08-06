@@ -1,9 +1,15 @@
 import Link from "next/link";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import moment from "moment";
 import { connect } from "react-redux";
 import { usePathname } from "next/navigation";
 import Modal from "../Modal/Modal";
+import parse from "html-react-parser";
+import dynamic from "next/dynamic";
+import { useForm } from "react-hook-form";
+
+const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
+import "react-quill/dist/quill.snow.css";
 
 const Post = ({ post, user }) => {
   const pathname = usePathname();
@@ -13,6 +19,29 @@ const Post = ({ post, user }) => {
   const [open, setOpen] = useState(false);
   const [onEdit, setOnEdit] = useState(false);
   const [onDelete, setOnDelete] = useState(false);
+
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    reset,
+    watch,
+    formState: { errors, isDirty, isValid },
+  } = useForm();
+
+  const modules = {
+    toolbar: [
+      [{ header: [1, 2, 3, 4, 5, 6, false] }],
+      ["bold", "italic", "underline", "strike"],
+      [{ color: [] }, { background: [] }],
+      [{ script: "sub" }, { script: "super" }],
+      ["blockquote", "code-block"],
+      [{ list: "ordered" }, { list: "bullet" }],
+      [{ indent: "-1" }, { indent: "+1" }, { align: [] }],
+      ["link", "image", "video"],
+      ["clean"],
+    ],
+  };
 
   const estimateReadingTimes = (post) => {
     const wordsPerMinute = 225;
@@ -28,7 +57,13 @@ const Post = ({ post, user }) => {
     document.body.style.overflow = "auto";
   };
 
-  console.log(user);
+  useEffect(() => {
+    if (onEdit) {
+      register("message", { required: "Message is required!" });
+    }
+  }, [register]);
+
+  const editorContent = watch("message");
 
   return (
     <>
@@ -91,6 +126,7 @@ const Post = ({ post, user }) => {
                   setOpen(true);
                   setOnDelete(false);
                   setOnEdit(true);
+                  console.log("post", post);
                 }}
               >
                 Edit
@@ -113,7 +149,6 @@ const Post = ({ post, user }) => {
             <button
               type="button"
               className="absolute top-3 end-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
-              data-modal-hide="popup-modal"
             >
               <svg
                 className="w-3 h-3"
@@ -124,9 +159,9 @@ const Post = ({ post, user }) => {
               >
                 <path
                   stroke="currentColor"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
                   d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"
                 />
               </svg>
@@ -144,9 +179,9 @@ const Post = ({ post, user }) => {
               >
                 <path
                   stroke="currentColor"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
                   d="M10 11V6m0 8h.01M19 10a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
                 />
               </svg>
@@ -174,22 +209,22 @@ const Post = ({ post, user }) => {
 
         {onEdit && (
           <div
-            className="relative p-4 w-full max-w-lg max-h-ful"
+            className="relative p-4 w-full max-w-xl max-h-ful"
             onClick={(e) => e.stopPropagation()}
           >
-            <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
-              <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
-                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+            <div className="relative bg-white rounded-lg shadow dark:bg-gray-700">
+              <div className="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                   Edit Post
                 </h3>
                 <button
                   type="button"
-                  class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
+                  className="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
                   data-modal-toggle="crud-modal"
                   onClick={() => handleOnClose()}
                 >
                   <svg
-                    class="w-3 h-3"
+                    className="w-3 h-3"
                     aria-hidden="true"
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
@@ -197,78 +232,85 @@ const Post = ({ post, user }) => {
                   >
                     <path
                       stroke="currentColor"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
                       d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"
                     />
                   </svg>
-                  <span class="sr-only">Close modal</span>
+                  <span className="sr-only">Close modal</span>
                 </button>
               </div>
 
-              <form class="p-4 md:p-5">
-                <div class="grid gap-4 mb-4 grid-cols-2">
-                  <div class="col-span-2">
+              <form className="p-4 md:p-5">
+                <div className="grid gap-4 mb-4 grid-cols-2">
+                  <div className="col-span-2">
                     <label
-                      for="name"
-                      class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                      htmlFor="name"
+                      className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                     >
                       Title
                     </label>
                     <input
                       type="text"
                       id="title"
-                      class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                       placeholder="Type product name"
-                      required=""
+                      defaultValue={post?.title}
                     />
                   </div>
-                  <div class="col-span-2">
+                  <div className="col-span-2">
                     <label
-                      for="name"
-                      class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                      htmlFor="name"
+                      className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                     >
                       Description
                     </label>
                     <input
                       type="text"
                       id="description"
-                      class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                       placeholder="Type product name"
-                      required=""
+                      defaultValue={post?.description}
                     />
                   </div>
 
-                  <div class="col-span-2">
+                  <div className="col-span-2">
                     <label
-                      for="description"
-                      class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                      htmlFor="description"
+                      className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                     >
                       Message
                     </label>
-                    <textarea
+                    {/* <textarea
                       id="description"
                       rows="4"
-                      class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                      placeholder="Write product description here"
-                    ></textarea>
+                      className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                    ></textarea> */}
+                    <ReactQuill
+                      id="edit-message"
+                      theme="snow"
+                      // value={editorContent}
+                      defaultValue={post?.message}
+                      modules={modules}
+                      onChange={(value) => setValue("message", value)}
+                    />
                   </div>
                 </div>
                 <button
                   type="submit"
-                  class="text-white inline-flex items-center bg-gradient-to-r from-cyan-400 via-cyan-500 to-cyan-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-cyan-300 dark:focus:ring-cyan-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center d"
+                  className="text-white inline-flex items-center bg-gradient-to-r from-cyan-400 via-cyan-500 to-cyan-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-cyan-300 dark:focus:ring-cyan-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center d"
                 >
                   <svg
-                    class="me-1 -ms-1 w-5 h-5"
+                    className="me-1 -ms-1 w-5 h-5"
                     fill="currentColor"
                     viewBox="0 0 20 20"
                     xmlns="http://www.w3.org/2000/svg"
                   >
                     <path
-                      fill-rule="evenodd"
+                      fillRule="evenodd"
                       d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
-                      clip-rule="evenodd"
+                      clipRule="evenodd"
                     ></path>
                   </svg>
                   Edit Post

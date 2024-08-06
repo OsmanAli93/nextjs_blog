@@ -44,6 +44,11 @@
   padding: 1rem 0;
 }
 
+#edit-message {
+  max-height: 450px;
+  overflow: auto;
+}
+
 .card {
   width: 100%;
   /* background-color: #fff; */
