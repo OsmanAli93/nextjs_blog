@@ -65,6 +65,10 @@ const Post = ({ post, user }) => {
 
   const editorContent = watch("message");
 
+  const onSubmit = (data) => {
+    console.log(data);
+  };
+
   return (
     <>
       <article className="flex flex-col mb-12">
@@ -242,7 +246,7 @@ const Post = ({ post, user }) => {
                 </button>
               </div>
 
-              <form className="p-4 md:p-5">
+              <form className="p-4 md:p-5" onSubmit={handleSubmit(onSubmit)}>
                 <div className="grid gap-4 mb-4 grid-cols-2">
                   <div className="col-span-2">
                     <label
@@ -254,6 +258,7 @@ const Post = ({ post, user }) => {
                     <input
                       type="text"
                       id="title"
+                      {...register("title")}
                       className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                       placeholder="Type product name"
                       defaultValue={post?.title}
@@ -269,6 +274,7 @@ const Post = ({ post, user }) => {
                     <input
                       type="text"
                       id="description"
+                      {...register("description")}
                       className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                       placeholder="Type product name"
                       defaultValue={post?.description}

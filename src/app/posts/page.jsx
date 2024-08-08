@@ -3,13 +3,14 @@ import React, { useState, useLayoutEffect, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { connect } from "react-redux";
 import { useRouter } from "next/navigation";
-import { Button, FileInput, Label, TextInput } from "flowbite-react";
+import { Button, FileInput, Label, TextInput, Alert } from "flowbite-react";
 import { CREATE_POST, LOADING } from "../../constants/index";
 import axiosInstance from "../../services/axiosInstance";
 
 import dynamic from "next/dynamic";
 const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
 import "react-quill/dist/quill.snow.css";
+import Link from "next/link";
 
 const Post = ({ access_token, user, create, pending, error }) => {
   const {
@@ -19,7 +20,7 @@ const Post = ({ access_token, user, create, pending, error }) => {
     reset,
     watch,
     formState: { errors, isDirty, isValid },
-  } = useForm();
+  } = useForm({ mode: "onChange" });
 
   const router = useRouter();
 
@@ -66,7 +67,7 @@ const Post = ({ access_token, user, create, pending, error }) => {
     console.log(data);
   };
 
-  console.log("error", error);
+  console.log("user", user);
 
   return (
     <section className="py-[90px]">
@@ -80,6 +81,35 @@ const Post = ({ access_token, user, create, pending, error }) => {
             <h2 className="text-xl font-semibold leading-7 mb-6 text-gray-900">
               Write An Article
             </h2>
+
+            {!user?.email_verified_at && (
+              <div
+                id="alert-4"
+                class="flex items-center p-4 mb-4 text-yellow-800 rounded-lg bg-yellow-50 dark:bg-gray-800 dark:text-yellow-300"
+                role="alert"
+              >
+                <svg
+                  class="flex-shrink-0 w-4 h-4"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z" />
+                </svg>
+                <span class="sr-only">Info</span>
+                <div class="ms-3 text-sm font-medium">
+                  Before you are allowed to create an article, you must ensure
+                  your email is verified first
+                  <Link
+                    href="/email/verify"
+                    class="font-semibold underline hover:no-underline ml-2"
+                  >
+                    verify email here
+                  </Link>
+                </div>
+              </div>
+            )}
 
             <div className="mb-4">
               <div className="mb-2 block">
@@ -161,7 +191,15 @@ const Post = ({ access_token, user, create, pending, error }) => {
             </div>
 
             <div className="mb-4 flex items-center justify-end gap-x-6">
-              <Button type="submit">Submit</Button>
+              <button
+                type="submit"
+                className="py-3 px-4 inline-flex justify-center items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent bg-teal-600 text-white hover:bg-teal-700 disabled:opacity-50 disabled:pointer-events-none"
+                disabled={
+                  !isDirty || !isValid || user?.email_verified_at === null
+                }
+              >
+                {pending ? <Spinner color="teal" /> : <span>Submit</span>}
+              </button>
             </div>
           </form>
         </div>
