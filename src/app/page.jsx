@@ -5,13 +5,11 @@ import Posts from "../components/Posts/Posts";
 import Toast from "../components/Toast/Toast";
 import { useSearchParams } from "next/navigation";
 import { GET_USER } from "../constants";
-import axios from "axios";
 import axiosInstance from "../services/axiosInstance";
 import postService from "../services/postService/postService,";
 import { Spinner } from "flowbite-react";
-import Skeleton from "../components/Posts/Skeleton";
 
-const Home = ({ access_token, success, error, user, getUser }) => {
+const Home = ({ access_token, success, error, user }) => {
   const searchParams = useSearchParams();
   const search = searchParams?.get("verified");
 
@@ -86,7 +84,11 @@ const Home = ({ access_token, success, error, user, getUser }) => {
     fetchPosts();
   }, [fetchPosts]);
 
-  console.log(posts.data);
+  const getData = (data) => {
+    console.log(data);
+  };
+
+  console.log(access_token);
 
   if (pending) {
     return (

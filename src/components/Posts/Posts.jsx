@@ -4,13 +4,11 @@ import Pagination from "../Pagination/Pagination";
 import Skeleton from "./Skeleton";
 
 const Posts = ({ posts, handlePageClick, currentPage, loading }) => {
-  console.log(posts);
-
   return (
     <>
       {loading ? (
         <div className="grid grid-cols-2 md:grid-cols-3 gap-5">
-          {posts.data?.map((post) => {
+          {[...Array(9)].map((e, i) => {
             return <Skeleton />;
           })}
         </div>

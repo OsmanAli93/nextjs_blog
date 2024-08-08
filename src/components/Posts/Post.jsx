@@ -2,16 +2,19 @@ import Link from "next/link";
 import React, { useState, useEffect } from "react";
 import moment from "moment";
 import { connect } from "react-redux";
+import { LOADING, UPDATE_POST } from "../../constants";
 import { usePathname } from "next/navigation";
 import Modal from "../Modal/Modal";
-import parse from "html-react-parser";
+import Toast from "../Toast/Toast";
 import dynamic from "next/dynamic";
 import { useForm } from "react-hook-form";
+import axiosInstance from "../../services/axiosInstance";
+import postService from "../../services/postService/postService,";
 
 const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
 import "react-quill/dist/quill.snow.css";
 
-const Post = ({ post, user }) => {
+const Post = ({ post, access_token, user, pending, updatePost }) => {
   const pathname = usePathname();
   const page = pathname.split("/")[1];
   const param = pathname.split("/")[2];
@@ -24,10 +27,16 @@ const Post = ({ post, user }) => {
     register,
     handleSubmit,
     setValue,
-    reset,
     watch,
     formState: { errors, isDirty, isValid },
-  } = useForm();
+  } = useForm({
+    defaultValues: {
+      _method: "PATCH",
+      title: post?.time,
+      description: post?.description,
+      message: post?.message,
+    },
+  });
 
   const modules = {
     toolbar: [
@@ -50,23 +59,21 @@ const Post = ({ post, user }) => {
     return `${time} min read`;
   };
 
+  const setDefaultHeaders = (access_token) => {
+    axiosInstance.defaults.headers.common.Authorization = `Bearer ${access_token}`;
+  };
+
+  const onSubmit = (data) => {
+    pending(true);
+    setDefaultHeaders(access_token);
+    updatePost(post?.id, data);
+    setOpen(false);
+  };
+
   const handleOnClose = () => {
     setOpen(false);
     setOnDelete(false);
     setOnEdit(false);
-    document.body.style.overflow = "auto";
-  };
-
-  useEffect(() => {
-    if (onEdit) {
-      register("message", { required: "Message is required!" });
-    }
-  }, [register]);
-
-  const editorContent = watch("message");
-
-  const onSubmit = (data) => {
-    console.log(data);
   };
 
   return (
@@ -213,7 +220,7 @@ const Post = ({ post, user }) => {
 
         {onEdit && (
           <div
-            className="relative p-4 w-full max-w-xl max-h-ful"
+            className="relative p-4 w-full max-w-xl h-auto"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="relative bg-white rounded-lg shadow dark:bg-gray-700">
@@ -253,6 +260,20 @@ const Post = ({ post, user }) => {
                       htmlFor="name"
                       className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                     >
+                      Thumbnail
+                    </label>
+                    <input
+                      type="file"
+                      id="thumbnail"
+                      {...register("thumbnail")}
+                      className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
+                    />
+                  </div>
+                  <div className="col-span-2">
+                    <label
+                      htmlFor="name"
+                      className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                    >
                       Title
                     </label>
                     <input
@@ -263,6 +284,7 @@ const Post = ({ post, user }) => {
                       placeholder="Type product name"
                       defaultValue={post?.title}
                     />
+                    <input type="hidden" {...register("_method")} />
                   </div>
                   <div className="col-span-2">
                     <label
@@ -288,11 +310,7 @@ const Post = ({ post, user }) => {
                     >
                       Message
                     </label>
-                    {/* <textarea
-                      id="description"
-                      rows="4"
-                      className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                    ></textarea> */}
+
                     <ReactQuill
                       id="edit-message"
                       theme="snow"
@@ -332,8 +350,17 @@ const Post = ({ post, user }) => {
 
 const mapStateToProps = (state) => {
   return {
+    access_token: state.auth.access_token,
     user: state.auth.user,
+    loading: state.post.loading,
   };
 };
 
-export default connect(mapStateToProps)(Post);
+const mapDispatchToProps = (dispatch) => {
+  return {
+    updatePost: (id, data) => dispatch({ type: UPDATE_POST, id, data }),
+    pending: (payload) => dispatch({ type: LOADING, payload }),
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Post);

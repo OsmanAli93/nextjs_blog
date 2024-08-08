@@ -53,6 +53,7 @@ const Post = ({ access_token, user, create, pending, error }) => {
   const setDefaultHeaders = (access_token) => {
     axiosInstance.defaults.headers.common.Authorization = `Bearer ${access_token}`;
   };
+
   const onSubmit = (data) => {
     const content = {
       thumbnail: data.thumbnail[0],
@@ -66,8 +67,6 @@ const Post = ({ access_token, user, create, pending, error }) => {
 
     console.log(data);
   };
-
-  console.log("user", user);
 
   return (
     <section className="py-[90px]">

@@ -31,6 +31,19 @@ const postService = {
       return error;
     }
   },
+  update: async (id, data) => {
+    try {
+      const response = await axiosInstance.post(`/posts/${id}`, data, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      return response;
+    } catch (error) {
+      return error;
+    }
+  },
   like: async (slug) => {
     try {
       const response = await axiosInstance.post(`/posts/${slug}/likes`, null);

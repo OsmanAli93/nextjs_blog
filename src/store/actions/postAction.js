@@ -1,5 +1,6 @@
 import {
   CREATE_POST,
+  UPDATE_POST,
   RESET_SUCCESS_MESSAGE,
   RESET_FAILED_MESSAGE,
   LOADING,
@@ -13,7 +14,12 @@ export const createPostAction = (data, router) => {
   };
 };
 
-ex;
+export const updatePostAction = (data) => {
+  return {
+    type: UPDATE_POST,
+    data,
+  };
+};
 
 export const resetSuccessMessage = () => {
   return {

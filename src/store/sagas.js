@@ -17,6 +17,9 @@ import {
   CREATE_POST,
   CREATE_POST_SUCCESS,
   CREATE_POST_FAILED,
+  UPDATE_POST,
+  UPDATE_POST_SUCCESS,
+  UPDATE_POST_FAILED,
 } from "../constants";
 
 import { takeLatest, takeEvery, put, call } from "redux-saga/effects";
@@ -195,6 +198,33 @@ function* createPost(action) {
   }
 }
 
+function* updatePost(action) {
+  const results = yield call(postService.update, action.id, action.data);
+
+  if (results?.code === "ERR_NETWORK") {
+    yield put({
+      type: UPDATE_POST_FAILED,
+      error: results.message,
+    });
+  }
+
+  if (results?.status >= 200 && results.status < 400) {
+    yield put({
+      type: UPDATE_POST_SUCCESS,
+      payload: results.data.posts,
+      success: results.data.message,
+    });
+  }
+
+  if (results?.response?.status >= 400 && results.response.status < 600) {
+    console.log(results);
+    yield put({
+      type: UPDATE_POST_FAILED,
+      error: results.response.statusText,
+    });
+  }
+}
+
 function* sagaWatcher() {
   yield takeLatest(REGISTER_USER, registerUser);
   yield takeLatest(LOGIN_USER, loginUser);
@@ -202,6 +232,7 @@ function* sagaWatcher() {
   yield takeLatest(UPDATE_PROFILE, updateProfile);
   yield takeEvery(GET_USER, getUser);
   yield takeLatest(CREATE_POST, createPost);
+  yield takeLatest(UPDATE_POST, updatePost);
 }
 
 export default sagaWatcher;

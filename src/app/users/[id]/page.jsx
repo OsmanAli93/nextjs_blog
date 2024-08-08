@@ -5,16 +5,14 @@ import axiosInstance from "../../../services/axiosInstance";
 import { connect } from "react-redux";
 import { useParams } from "next/navigation";
 import { Avatar, Spinner } from "flowbite-react";
+import Toast from "../../../components/Toast/Toast";
 import Posts from "../../../components/Posts/Posts";
 
-const User = () => {
+const User = ({ editSuccess, editPosts }) => {
   const { id } = useParams();
   const [user, setUser] = useState(null);
   const [posts, setPosts] = useState([]);
   const [pending, setPending] = useState(false);
-  const [error, setError] = useState("");
-
-  console.log(posts);
 
   const fetchUserPosts = useCallback(async () => {
     setPending(true);
@@ -40,8 +38,14 @@ const User = () => {
   }, []);
 
   useEffect(() => {
+    if (editPosts.length > 0) {
+      setPosts(editPosts);
+    }
+
     fetchUserPosts();
-  }, [fetchUserPosts]);
+  }, [fetchUserPosts, editPosts]);
+
+  console.log("edit", editPosts);
 
   if (pending) {
     return (
@@ -112,8 +116,17 @@ const User = () => {
           <Posts posts={posts} />
         </div>
       </div>
+
+      {editSuccess !== "" && <Toast success={true} message={editSuccess} />}
     </section>
   );
 };
 
-export default User;
+const mapStateToProps = (state) => {
+  return {
+    editSuccess: state.post.successMessage,
+    editPosts: state.post.posts,
+  };
+};
+
+export default connect(mapStateToProps)(User);
