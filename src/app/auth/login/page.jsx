@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useLayoutEffect } from "react";
 import Link from "next/link";
 import { connect } from "react-redux";
 import { useRouter } from "next/navigation";
@@ -30,7 +30,7 @@ const fields = [
   },
 ];
 
-const Login = ({ loading, pending, error, loginUser }) => {
+const Login = ({ loading, pending, error, loginUser, access_token }) => {
   const {
     register,
     handleSubmit,
@@ -44,7 +44,11 @@ const Login = ({ loading, pending, error, loginUser }) => {
     loginUser(user, router);
   };
 
-  console.log(loading);
+  useLayoutEffect(() => {
+    if (access_token) {
+      router.push("/");
+    }
+  }, [access_token]);
 
   return (
     <div className="w-full max-w-lg mx-auto p-6">
@@ -203,6 +207,7 @@ const Login = ({ loading, pending, error, loginUser }) => {
 
 const mapStateToProps = (state) => {
   return {
+    access_token: state.auth.access_token,
     loading: state.auth.loading,
     error: state.auth.errorMessage,
   };

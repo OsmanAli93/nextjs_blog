@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import React, { useState } from "react";
+import React, { useState, useLayoutEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { connect } from "react-redux";
@@ -41,7 +41,7 @@ const fields = [
   },
 ];
 
-const Register = ({ loading, pending, error, addUser }) => {
+const Register = ({ loading, pending, error, addUser, access_token }) => {
   const {
     register,
     handleSubmit,
@@ -55,6 +55,12 @@ const Register = ({ loading, pending, error, addUser }) => {
     pending(true);
     addUser(data, router);
   };
+
+  useLayoutEffect(() => {
+    if (access_token) {
+      router.push("/");
+    }
+  }, [access_token]);
 
   console.log(loading);
 
@@ -220,6 +226,7 @@ const Register = ({ loading, pending, error, addUser }) => {
 
 const mapStateToProps = (state) => {
   return {
+    access_token: state.auth.access_token,
     loading: state.auth.loading,
     error: state.auth.errorMessage,
   };

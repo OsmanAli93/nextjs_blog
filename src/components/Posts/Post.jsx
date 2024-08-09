@@ -2,19 +2,24 @@ import Link from "next/link";
 import React, { useState, useEffect } from "react";
 import moment from "moment";
 import { connect } from "react-redux";
-import { LOADING, UPDATE_POST } from "../../constants";
+import { LOADING, UPDATE_POST, DELETE_POST } from "../../constants";
 import { usePathname } from "next/navigation";
 import Modal from "../Modal/Modal";
-import Toast from "../Toast/Toast";
 import dynamic from "next/dynamic";
 import { useForm } from "react-hook-form";
 import axiosInstance from "../../services/axiosInstance";
-import postService from "../../services/postService/postService,";
 
 const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
 import "react-quill/dist/quill.snow.css";
 
-const Post = ({ post, access_token, user, pending, updatePost }) => {
+const Post = ({
+  post,
+  access_token,
+  user,
+  pending,
+  updatePost,
+  deletePost,
+}) => {
   const pathname = usePathname();
   const page = pathname.split("/")[1];
   const param = pathname.split("/")[2];
@@ -68,6 +73,15 @@ const Post = ({ post, access_token, user, pending, updatePost }) => {
     setDefaultHeaders(access_token);
     updatePost(post?.id, data);
     setOpen(false);
+  };
+
+  const handleDelete = (id) => {
+    console.log(id);
+    pending(true);
+    setDefaultHeaders(access_token);
+    deletePost(post?.id, {
+      _method: "DELETE",
+    });
   };
 
   const handleOnClose = () => {
@@ -156,7 +170,10 @@ const Post = ({ post, access_token, user, pending, updatePost }) => {
 
       <Modal open={open} close={handleOnClose}>
         {onDelete && (
-          <div className="relative bg-white rounded-lg shadow dark:bg-gray-700">
+          <div
+            className="relative bg-white rounded-lg shadow dark:bg-gray-700"
+            onClick={(e) => e.stopPropagation()}
+          >
             <button
               type="button"
               className="absolute top-3 end-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
@@ -203,6 +220,7 @@ const Post = ({ post, access_token, user, pending, updatePost }) => {
                 data-modal-hide="popup-modal"
                 type="button"
                 className="text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center"
+                onClick={() => handleDelete(post?.id)}
               >
                 Yes, I'm sure
               </button>
@@ -359,6 +377,7 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = (dispatch) => {
   return {
     updatePost: (id, data) => dispatch({ type: UPDATE_POST, id, data }),
+    deletePost: (id, data) => dispatch({ type: UPDATE_POST, id, data }),
     pending: (payload) => dispatch({ type: LOADING, payload }),
   };
 };

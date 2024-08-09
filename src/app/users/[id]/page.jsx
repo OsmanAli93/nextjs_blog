@@ -8,7 +8,7 @@ import { Avatar, Spinner } from "flowbite-react";
 import Toast from "../../../components/Toast/Toast";
 import Posts from "../../../components/Posts/Posts";
 
-const User = ({ editSuccess, editPosts }) => {
+const User = ({ success, editPosts }) => {
   const { id } = useParams();
   const [user, setUser] = useState(null);
   const [posts, setPosts] = useState([]);
@@ -117,14 +117,14 @@ const User = ({ editSuccess, editPosts }) => {
         </div>
       </div>
 
-      {editSuccess !== "" && <Toast success={true} message={editSuccess} />}
+      {success !== "" && <Toast success={true} message={success} />}
     </section>
   );
 };
 
 const mapStateToProps = (state) => {
   return {
-    editSuccess: state.post.successMessage,
+    success: state.post.successMessage,
     editPosts: state.post.posts,
   };
 };
