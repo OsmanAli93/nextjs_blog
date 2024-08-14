@@ -27,7 +27,7 @@ table relationship, model and so on . Every part of this project is sample code 
 * Laravel
 
 ### SOURCE CODE FOR BACKEND
-[Link for backend source code](https://github.com/Manar-Tech/fawwaz-laravel)
+[Link for backend source code](https://github.com/OsmanAli93/laravel_blog)
 
 ## Watch some of the examples
 
