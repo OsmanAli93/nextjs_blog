@@ -9,7 +9,7 @@ import axiosInstance from "../services/axiosInstance";
 import postService from "../services/postService/postService,";
 import { Spinner } from "flowbite-react";
 
-const Home = ({ access_token, success, error, user }) => {
+const Home = ({ access_token, success, error, user, getUser }) => {
   const searchParams = useSearchParams();
   const search = searchParams?.get("verified");
 

@@ -2,6 +2,7 @@ import axiosInstance from "../axiosInstance";
 
 const followService = {
   follow: async (id) => {
+    console.log(id);
     try {
       const response = await axiosInstance.post("/follow", id);
       return response;

@@ -48,7 +48,7 @@ const User = ({ user, access_token, success, editPosts }) => {
     }
   }, []);
 
-  const isFollower = !!followers.find((follower) => follower.id === user.id);
+  const isFollower = !!followers?.find((follower) => follower.id === user.id);
 
   useEffect(() => {
     if (editPosts.length > 0) {
@@ -67,6 +67,7 @@ const User = ({ user, access_token, success, editPosts }) => {
   //     </div>
   //   );
   // }
+  console.log(user.id, +id);
 
   return (
     <section className="py-[90px]">
@@ -102,61 +103,66 @@ const User = ({ user, access_token, success, editPosts }) => {
               />
               <h4 className="text-lg font-bold mt-2">{pageUser?.name}</h4>
               <div className="text-gray-600 mb-2">{pageUser?.profile.city}</div>
-              {isFollower ? (
-                <button
-                  className="text-white bg-gradient-to-r from-cyan-400 via-cyan-500 to-cyan-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-cyan-300  font-medium rounded-full text-sm px-8 py-2 text-center dark:bg-cyan-600 dark:hover:bg-cyan-700"
-                  onClick={async () => {
-                    setDefaultHeaders(access_token);
-                    const results = await followService.unfollow({
-                      user_id: id,
-                    });
 
-                    if (results?.code === "ERR_NETWORK") {
-                      console.log(results);
-                    }
+              {user.id !== +id && (
+                <>
+                  {isFollower ? (
+                    <button
+                      className="text-white bg-gradient-to-r from-cyan-400 via-cyan-500 to-cyan-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-cyan-300  font-medium rounded-full text-sm px-8 py-2 text-center dark:bg-cyan-600 dark:hover:bg-cyan-700"
+                      onClick={async () => {
+                        setDefaultHeaders(access_token);
+                        const results = await followService.unfollow({
+                          id,
+                        });
 
-                    if (results?.status >= 200 && results.status < 400) {
-                      setFollowersCount(results.data.followers_count);
-                    }
+                        if (results?.code === "ERR_NETWORK") {
+                          console.log(results);
+                        }
 
-                    if (
-                      results?.response?.status >= 400 &&
-                      results?.response?.status < 600
-                    ) {
-                      console.log(results);
-                    }
-                  }}
-                >
-                  Following
-                </button>
-              ) : (
-                <button
-                  className="text-white bg-gradient-to-r from-cyan-400 via-cyan-500 to-cyan-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-cyan-300  font-medium rounded-full text-sm px-8 py-2 text-center dark:bg-cyan-600 dark:hover:bg-cyan-700"
-                  onClick={async () => {
-                    setDefaultHeaders(access_token);
-                    const results = await followService.follow({
-                      user_id: id,
-                    });
+                        if (results?.status >= 200 && results.status < 400) {
+                          setFollowersCount(results.data.followers_count);
+                        }
 
-                    if (results?.code === "ERR_NETWORK") {
-                      console.log(results);
-                    }
+                        if (
+                          results?.response?.status >= 400 &&
+                          results?.response?.status < 600
+                        ) {
+                          console.log(results);
+                        }
+                      }}
+                    >
+                      Following
+                    </button>
+                  ) : (
+                    <button
+                      className="text-white bg-gradient-to-r from-cyan-400 via-cyan-500 to-cyan-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-cyan-300  font-medium rounded-full text-sm px-8 py-2 text-center dark:bg-cyan-600 dark:hover:bg-cyan-700"
+                      onClick={async () => {
+                        setDefaultHeaders(access_token);
+                        const results = await followService.follow({
+                          id,
+                        });
 
-                    if (results?.status >= 200 && results.status < 400) {
-                      setFollowersCount(results.data.followers_count);
-                      console.log(results);
-                    }
+                        if (results?.code === "ERR_NETWORK") {
+                          console.log(results);
+                        }
 
-                    if (
-                      results?.response?.status >= 400 &&
-                      results?.response?.status < 600
-                    ) {
-                      console.log(results);
-                    }
-                  }}
-                >
-                  Follow
-                </button>
+                        if (results?.status >= 200 && results.status < 400) {
+                          setFollowersCount(results.data.followers_count);
+                          console.log(results);
+                        }
+
+                        if (
+                          results?.response?.status >= 400 &&
+                          results?.response?.status < 600
+                        ) {
+                          console.log(results);
+                        }
+                      }}
+                    >
+                      Follow
+                    </button>
+                  )}
+                </>
               )}
             </div>
           </div>
